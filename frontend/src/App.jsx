@@ -6,6 +6,7 @@ import Layout from './components/Layout.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
 import Products from './pages/Products.jsx';
+import Categories from './pages/Categories.jsx';
 import Invoices from './pages/Invoices.jsx';
 import InvoiceForm from './pages/InvoiceForm.jsx';
 import InvoiceDetail from './pages/InvoiceDetail.jsx';
@@ -152,7 +153,7 @@ export default function App() {
 
           <Route
             path="products"
-            element={<Products t={t} settings={settings} />}
+            element={<Products t={t} settings={settings} user={user} />}
           />
 
           <Route
@@ -192,6 +193,11 @@ export default function App() {
 
           {user.role === 'owner' && (
             <>
+              <Route
+                path="categories"
+                element={<Categories />}
+              />
+
               <Route
                 path="branches"
                 element={<Branches />}

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "migrate:customers": "node src/scripts/migrateCustomers.js"
+    "migrate:customers": "node src/scripts/migrateCustomers.js",
+    "migrate:categories": "node src/scripts/migrateCategories.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

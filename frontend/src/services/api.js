@@ -34,7 +34,11 @@ export const api = {
   moneyReceipt: id => request(`/money-receipts/${id}`),
 
   dashboard: () => request('/dashboard/summary'),
-  products: (q = '') => request(`/products${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  categories: (includeInactive = false) => request(`/categories${includeInactive ? '?includeInactive=true' : ''}`),
+  createCategory: body => request('/categories', { method: 'POST', body: JSON.stringify(body) }),
+  updateCategory: (id, body) => request(`/categories/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteCategory: id => request(`/categories/${id}`, { method: 'DELETE' }),
+  products: (q = '', includeInactive = false) => { const params = new URLSearchParams(); if (q) params.set('q', q); if (includeInactive) params.set('includeInactive', 'true'); const query = params.toString(); return request(`/products${query ? `?${query}` : ''}`); },
   createProduct: body => request('/products', { method: 'POST', body: JSON.stringify(body) }),
   updateProduct: (id, body) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteProduct: id => request(`/products/${id}`, { method: 'DELETE' }),

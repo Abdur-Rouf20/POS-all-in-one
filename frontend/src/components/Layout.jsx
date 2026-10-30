@@ -4,6 +4,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
+  Tags,
   ReceiptText,
   Settings as SettingsIcon,
   Languages,
@@ -53,6 +54,11 @@ export default function Layout({ lang, setLang, t, user }) {
 
           {user?.role === 'owner' && (
             <>
+              <NavLink to="/categories">
+                <Tags size={18} />
+                Product Categories
+              </NavLink>
+
               <NavLink to="/branches">
                 <GitBranch size={18} />
                 Branch Management
