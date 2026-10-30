@@ -1,1 +1,9 @@
-export default function Modal({title,children,onClose}) { return <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="modal"><div className="modal-head"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close">×</button></div>{children}</section></div> }
+export default function Modal({ title, children, onClose }) 
+    { return <div className="modal-backdrop" onMouseDown={e => e.target === e.currentTarget && onClose()}>
+        <section className="modal">
+            <div className="modal-head">
+    <h2>{title}</h2>
+    <button className="icon-button" onClick={onClose} aria-label="Close">X</button>
+    </div>{children}</section>
+    </div> 
+    }

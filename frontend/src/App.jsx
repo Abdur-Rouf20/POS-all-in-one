@@ -14,6 +14,10 @@ import Login from './pages/Login.jsx';
 import Inventory from './pages/Inventory.jsx';
 import Branches from './pages/Branches.jsx';
 import Users from './pages/Users.jsx';
+import Customers from './pages/Customers.jsx';
+import CustomerLedger from './pages/CustomerLedger.jsx';
+import MoneyReceipts from './pages/MoneyReceipts.jsx';
+import MoneyReceiptDetail from './pages/MoneyReceiptDetail.jsx';
 
 import { translations } from './i18n.js';
 import { api } from './services/api.js';
@@ -155,6 +159,11 @@ export default function App() {
             path="inventory"
             element={<Inventory />}
           />
+
+          <Route path="customers" element={<Customers settings={settings} />} />
+          <Route path="customers/:id" element={<CustomerLedger settings={settings} />} />
+          <Route path="money-receipts" element={<MoneyReceipts settings={settings} />} />
+          <Route path="money-receipts/:id" element={<MoneyReceiptDetail settings={settings} />} />
 
           <Route
             path="invoices"

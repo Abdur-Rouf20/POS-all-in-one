@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { findCustomer, createCustomer, listCustomers, customerLedger } from '../controllers/customerController.js';
+const router = Router();
+router.use(authenticate, authorize('customer.view'));
+router.get('/lookup', findCustomer);
+router.get('/', listCustomers);
+router.post('/', authorize('customer.create'), createCustomer);
+router.get('/:id/ledger', customerLedger);
+export default router;
