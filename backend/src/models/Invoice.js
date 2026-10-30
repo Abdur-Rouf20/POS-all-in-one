@@ -5,7 +5,15 @@ const itemSchema = new mongoose.Schema({
   sku: { type: String, default: '' },
   quantity: { type: Number, required: true, min: 0.01 },
   unitPrice: { type: Number, required: true, min: 0 },
-  lineTotal: { type: Number, required: true, min: 0 }
+  lineTotal: { type: Number, required: true, min: 0 },
+  batchAllocations: [{
+    batchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch', required: true },
+    batchNo: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 0.0001 },
+    unitCost: { type: Number, default: null },
+    costStatus: { type: String, enum: ['pending_owner', 'confirmed'], default: 'pending_owner' },
+    sellingPrice: { type: Number, required: true, min: 0 }
+  }]
 }, { _id: false });
 const invoiceSchema = new mongoose.Schema({
   invoiceNo: { type: String, required: true },

@@ -14,6 +14,9 @@ export default function InvoiceForm({ t, settings }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [batchOptions, setBatchOptions] = useState({});
+  const currentUser = useMemo(() => { try { return JSON.parse(localStorage.getItem('pos-user') || 'null'); } catch { return null; } }, []);
+  const isOwner = currentUser?.role === 'owner';
   const [form, setForm] = useState(() => initialForm(settings));
   const [error, setError] = useState('');
   const [customerMessage, setCustomerMessage] = useState('');
@@ -48,9 +51,20 @@ export default function InvoiceForm({ t, settings }) {
   function updateItem(index, key, value) {
     setForm(current => ({ ...current, items: current.items.map((item, i) => i === index ? { ...item, [key]: value } : item) }));
   }
-  function chooseProduct(index, productId) {
+  async function chooseProduct(index, productId) {
     const product = products.find(item => item._id === productId);
-    setForm(current => ({ ...current, items: current.items.map((item, i) => i === index ? (product ? { ...item, product: product._id, name: product.name, sku: product.sku || '', unitPrice: product.price } : blankItem()) : item) }));
+    if (!product) { setForm(current => ({ ...current, items: current.items.map((item, i) => i === index ? blankItem() : item) })); return; }
+    try {
+      const availableBatches = await api.batches(productId);
+      setBatchOptions(current => ({ ...current, [productId]: availableBatches }));
+      const firstBatch = availableBatches[0];
+      setForm(current => ({ ...current, items: current.items.map((item, i) => i === index ? { ...item, product: product._id, name: product.name, sku: product.sku || '', unitPrice: firstBatch?.sellingPrice ?? product.price, batchId: '' } : item) }));
+    } catch (e) { setError(e.message); }
+  }
+  function chooseBatch(index, batchId) {
+    const item = form.items[index];
+    const batch = (batchOptions[item.product] || []).find(row => row._id === batchId);
+    setForm(current => ({ ...current, items: current.items.map((row, i) => i === index ? { ...row, batchId, ...(batch ? { unitPrice: batch.sellingPrice } : {}) } : row) }));
   }
   async function lookupCustomer() {
     const phone = form.customerPhone.trim();
@@ -73,7 +87,7 @@ export default function InvoiceForm({ t, settings }) {
     try {
       const body = {
         ...form,
-        items: form.items.map(item => ({ ...item, quantity: Number(item.quantity), unitPrice: Number(item.unitPrice) })),
+        items: form.items.map(item => ({ ...item, quantity: Number(item.quantity), unitPrice: Number(item.unitPrice), ...(isOwner && item.batchId ? { batchId: item.batchId } : {}) })),
         discount: Number(form.discount) || 0, taxRate: Number(form.taxRate) || 0,
         paidAmount, cashAmount, banglaQrAmount
       };
@@ -103,6 +117,7 @@ export default function InvoiceForm({ t, settings }) {
           <div className="invoice-items">{form.items.map((item, index) => <div className="invoice-item" key={index}>
             <div className="item-index">{String(index + 1).padStart(2, '0')}</div>
             <div className="field item-product"><label>{t.product}</label><select value={item.product || ''} onChange={e => chooseProduct(index, e.target.value)}><option value="">{t.chooseProduct}</option>{products.map(product => <option key={product._id} value={product._id}>{product.name}{product.sku ? ` · ${product.sku}` : ''} · Stock: {product.branchQuantity}</option>)}</select></div>
+            {isOwner && item.product && <div className="field item-product"><label>Manual batch override (optional)</label><select value={item.batchId || ''} onChange={e => chooseBatch(index, e.target.value)}><option value="">FIFO — oldest batch first</option>{(batchOptions[item.product] || []).map(batch => <option key={batch._id} value={batch._id}>{batch.batchNo} · Available: {batch.quantity} · Sell: {money(batch.sellingPrice)}</option>)}</select></div>}
             <div className="field item-qty"><label>{t.quantity}</label><input type="number" min="0.01" step="0.01" required value={item.quantity} onChange={e => updateItem(index, 'quantity', e.target.value)}/></div>
             <div className="field item-price"><label>{t.price}</label><input type="number" min="0" step="0.01" required value={item.unitPrice} onChange={e => updateItem(index, 'unitPrice', e.target.value)}/></div>
             <div className="item-total"><small>{t.total}</small><strong>{money(Number(item.quantity || 0) * Number(item.unitPrice || 0))}</strong></div>

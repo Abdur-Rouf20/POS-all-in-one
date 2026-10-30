@@ -1674,3 +1674,12 @@ tbody tr:hover {
 .signature-line { width: 80%; height: 1px; background: #5f6877; margin-top: 22px; }
 .receipt-footer { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 15px; text-align: center; font-size: 11px; color: #7c8798; }
 @media print { .receipt-signatures { break-inside: avoid; } }
+
+/* Phase 3 batch inventory presentation */
+.batch-list { display: grid; gap: 8px; min-width: 260px; }
+.batch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+.batch-row > div:first-child { display: grid; gap: 3px; }
+.batch-row small { color: var(--muted); font-size: 12px; }
+.batch-cost-editor { display: flex; align-items: center; gap: 7px; }
+.batch-cost-editor input { width: 130px; min-width: 0; }
+@media (max-width: 760px) { .batch-row { align-items: flex-start; flex-direction: column; } .batch-cost-editor { width: 100%; } }

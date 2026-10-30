@@ -1,1 +1,11 @@
-import {Router} from 'express';import {listInventory,receiveStock,listMovements} from '../controllers/inventoryController.js';import {authenticate,authorize,resolveBranch} from '../middleware/auth.js';const r=Router();r.use(authenticate,resolveBranch());r.get('/',authorize('inventory.view'),listInventory);r.post('/receive',authorize('inventory.receive'),receiveStock);r.get('/movements',authorize('inventory.view'),listMovements);export default r;
+import { Router } from 'express';
+import { listInventory, listBatches, receiveStock, updateBatchCost, listMovements } from '../controllers/inventoryController.js';
+import { authenticate, authorize, resolveBranch } from '../middleware/auth.js';
+const r = Router();
+r.use(authenticate, resolveBranch());
+r.get('/', authorize('inventory.view'), listInventory);
+r.get('/batches', authorize('inventory.view'), listBatches);
+r.post('/receive', authorize('inventory.receive'), receiveStock);
+r.patch('/batches/:id/cost', authorize('inventory.adjust'), updateBatchCost);
+r.get('/movements', authorize('inventory.view'), listMovements);
+export default r;
