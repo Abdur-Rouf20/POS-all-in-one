@@ -1,0 +1,1 @@
+import {Router} from 'express';import {listBranches,createBranch,updateBranch} from '../controllers/branchController.js';import {authenticate,authorize} from '../middleware/auth.js';const r=Router();r.use(authenticate);r.get('/',listBranches);r.post('/',authorize('branch.manage'),createBranch);r.put('/:id',authorize('branch.manage'),updateBranch);export default r;

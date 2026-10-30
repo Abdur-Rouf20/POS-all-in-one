@@ -1,0 +1,1 @@
+import {Router} from 'express';import {getSettings,updateSettings} from '../controllers/settingsController.js';import {authenticate,authorize} from '../middleware/auth.js';const r=Router();r.use(authenticate);r.get('/',getSettings);r.put('/',authorize('settings.manage'),updateSettings);export default r;

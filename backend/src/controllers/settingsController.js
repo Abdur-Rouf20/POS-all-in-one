@@ -1,0 +1,4 @@
+import Settings from '../models/Settings.js';
+const defaults={key:'store',businessName:'My POS Store',address:'',phone:'',currency:'৳',taxRate:0,invoiceFooter:'Thank you for your business!'};
+export async function getSettings(req,res,next){try{let s=await Settings.findOne({key:'store'});if(!s)s=await Settings.create(defaults);res.json(s);}catch(e){next(e);}}
+export async function updateSettings(req,res,next){try{let s=await Settings.findOneAndUpdate({key:'store'},{$set:{businessName:String(req.body.businessName??defaults.businessName),address:String(req.body.address??''),phone:String(req.body.phone??''),currency:String(req.body.currency??'৳'),taxRate:Math.max(0,Number(req.body.taxRate)||0),invoiceFooter:String(req.body.invoiceFooter??defaults.invoiceFooter)}},{new:true,upsert:true,runValidators:true,setDefaultsOnInsert:true});res.json(s);}catch(e){next(e);}}

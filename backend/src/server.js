@@ -1,0 +1,41 @@
+import express from 'express'; 
+import cors from 'cors';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs'; 
+import { connectDB } from './config/db.js';
+import User from './models/User.js';
+import Branch from './models/Branch.js';
+import productRoutes from './routes/productRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import branchRoutes from './routes/branchRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';import paymentRoutes from './routes/paymentRoutes.js';
+import { summary } from './controllers/dashboardController.js';
+import { authenticate, resolveBranch } from './middleware/auth.js';
+
+dotenv.config(); const app = express();
+ app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',') || true }));
+  app.use(express.json({ limit: '1mb' })); 
+  app.use(morgan('dev'));
+   app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'pos-api' }));
+    app.use('/api/auth', authRoutes);
+     app.use('/api/branches', branchRoutes); 
+     app.use('/api/products', productRoutes);
+      app.use('/api/inventory', inventoryRoutes);
+       app.use('/api/invoices', invoiceRoutes);
+        app.use('/api/payments', paymentRoutes);
+         app.use('/api/settings', settingsRoutes);
+          app.get('/api/dashboard/summary', authenticate, resolveBranch({ allowAllForOwner: true }), summary);
+
+app.use((err, req, res, next) => { console.error(err);
+     const status = err.status || (err.code === 11000 ? 409 : 500);
+      res.status(status).json({ message: err.code === 11000 ? 'A record with this unique value already exists.' : err.message || 'Internal server error.' }); });
+async function seedOwner() { if (await User.exists({ role: 'owner' })) return;
+ if (!process.env.OWNER_EMAIL || !process.env.OWNER_PASSWORD || !process.env.JWT_SECRET) throw new Error('Set OWNER_EMAIL, OWNER_PASSWORD and JWT_SECRET in the environment before first startup.'); 
+ let branch = await Branch.findOne({ code: 'MAIN' }); 
+ if (!branch) branch = await Branch.create({ name: process.env.DEFAULT_BRANCH_NAME || 'Main Branch', code: 'MAIN' }); await User.create({ name: process.env.OWNER_NAME || 'Shop Owner', email: process.env.OWNER_EMAIL, passwordHash: await bcrypt.hash(process.env.OWNER_PASSWORD, 12), role: 'owner', branchId: null, permissions: [] }); console.log(`Initial owner created: ${process.env.OWNER_EMAIL}`); }
+const port = process.env.PORT || 5000; connectDB().then(seedOwner).then(() => app.listen(port, () => console.log(`POS API listening on ${port}`))).catch(err => { console.error('Startup failed:', err.message);
+    process.exit(1);
+ });
