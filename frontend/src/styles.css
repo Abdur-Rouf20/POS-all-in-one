@@ -1683,3 +1683,5 @@ tbody tr:hover {
 .batch-cost-editor { display: flex; align-items: center; gap: 7px; }
 .batch-cost-editor input { width: 130px; min-width: 0; }
 @media (max-width: 760px) { .batch-row { align-items: flex-start; flex-direction: column; } .batch-cost-editor { width: 100%; } }
+
+.metric-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border,#e5e7eb)}

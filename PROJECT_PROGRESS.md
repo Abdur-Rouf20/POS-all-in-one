@@ -33,3 +33,10 @@ Apply Phase 6 patch and test as Owner:
 
 ## Remaining roadmap
 Continue with the next planned project phases after Phase 6 is confirmed working. Keep CSS redesign and UAT feedback fixes until the agreed later stage.
+
+
+## Phase 7 — Dashboard & Analytics
+- Date filters, net sales, returns, due, payments, product performance and low-stock metrics.
+- Owner-only gross/net profit, expenses, stock valuation and branch comparison.
+- Salesmen receive assigned-branch operational metrics only; no cost/profit fields.
+- Partial profit warning where batch costs are not confirmed.

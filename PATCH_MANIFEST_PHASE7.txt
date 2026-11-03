@@ -1,0 +1,1 @@
+Replace dashboardController.js, auth.js, api.js, Dashboard.jsx, styles.css, PROJECT_PROGRESS.md. Add README_PHASE7_SETUP.md and PATCH_MANIFEST_PHASE7.txt.

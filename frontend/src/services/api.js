@@ -40,7 +40,7 @@ export const api = {
   updateExpense: (id, body) => request(`/expenses/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteExpense: id => request(`/expenses/${id}`, { method: 'DELETE' }),
 
-  dashboard: () => request('/dashboard/summary'),
+  dashboard: (filters = {}) => { const p = new URLSearchParams(); if(filters.from)p.set('from',filters.from); if(filters.to)p.set('to',filters.to); if(filters.allBranches)p.set('allBranches','true'); const q=p.toString(); return request(`/dashboard/summary${q?'?'+q:''}`,filters.allBranches?{headers:{'X-Branch-Id':''}}:{}); },
   categories: (includeInactive = false) => request(`/categories${includeInactive ? '?includeInactive=true' : ''}`),
   createCategory: body => request('/categories', { method: 'POST', body: JSON.stringify(body) }),
   updateCategory: (id, body) => request(`/categories/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
