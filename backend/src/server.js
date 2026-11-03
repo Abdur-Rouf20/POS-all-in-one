@@ -16,6 +16,7 @@ import inventoryRoutes from './routes/inventoryRoutes.js';import paymentRoutes f
 import customerRoutes from './routes/customerRoutes.js';
 import moneyReceiptRoutes from './routes/moneyReceiptRoutes.js';
 import salesReturnRoutes from './routes/salesReturnRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
 import { summary } from './controllers/dashboardController.js';
 import { authenticate, resolveBranch } from './middleware/auth.js';
 
@@ -34,6 +35,7 @@ dotenv.config(); const app = express();
          app.use('/api/customers', customerRoutes);
          app.use('/api/money-receipts', moneyReceiptRoutes);
          app.use('/api/returns', salesReturnRoutes);
+         app.use('/api/expenses', expenseRoutes);
          app.use('/api/settings', settingsRoutes);
           app.get('/api/dashboard/summary', authenticate, resolveBranch({ allowAllForOwner: true }), summary);
 

@@ -35,6 +35,10 @@ export const api = {
   salesReturns: (invoiceId = '') => request(`/returns${invoiceId ? `?invoiceId=${encodeURIComponent(invoiceId)}` : ''}`),
   createSalesReturn: body => request('/returns', { method: 'POST', body: JSON.stringify(body) }),
   salesReturn: id => request(`/returns/${id}`),
+  expenses: (filters = {}) => { const params = new URLSearchParams(); if (filters.category) params.set('category', filters.category); if (filters.from) params.set('from', filters.from); if (filters.to) params.set('to', filters.to); const query = params.toString(); return request(`/expenses${query ? `?${query}` : ''}`); },
+  createExpense: body => request('/expenses', { method: 'POST', body: JSON.stringify(body) }),
+  updateExpense: (id, body) => request(`/expenses/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteExpense: id => request(`/expenses/${id}`, { method: 'DELETE' }),
 
   dashboard: () => request('/dashboard/summary'),
   categories: (includeInactive = false) => request(`/categories${includeInactive ? '?includeInactive=true' : ''}`),

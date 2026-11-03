@@ -20,6 +20,7 @@ import CustomerLedger from './pages/CustomerLedger.jsx';
 import MoneyReceipts from './pages/MoneyReceipts.jsx';
 import MoneyReceiptDetail from './pages/MoneyReceiptDetail.jsx';
 import SalesReturns from './pages/SalesReturns.jsx';
+import Expenses from './pages/Expenses.jsx';
 
 import { translations } from './i18n.js';
 import { api } from './services/api.js';
@@ -167,6 +168,7 @@ export default function App() {
           <Route path="money-receipts" element={<MoneyReceipts settings={settings} />} />
           <Route path="money-receipts/:id" element={<MoneyReceiptDetail settings={settings} />} />
           <Route path="returns" element={<SalesReturns settings={settings} />} />
+          {user.role === 'owner' && <Route path="expenses" element={<Expenses settings={settings} />} />}
 
           <Route
             path="invoices"

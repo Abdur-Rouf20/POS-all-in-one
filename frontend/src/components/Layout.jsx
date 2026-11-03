@@ -14,7 +14,8 @@ import {
   Users,
   ContactRound,
   Wallet,
-  RotateCcw
+  RotateCcw,
+  WalletCards
 } from 'lucide-react';
 
 export default function Layout({ lang, setLang, t, user }) {
@@ -63,6 +64,11 @@ export default function Layout({ lang, setLang, t, user }) {
               <NavLink to="/branches">
                 <GitBranch size={18} />
                 Branch Management
+              </NavLink>
+
+              <NavLink to="/expenses">
+                <WalletCards size={18} />
+                Expense Tracker
               </NavLink>
 
               <NavLink to="/users">

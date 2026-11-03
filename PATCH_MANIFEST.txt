@@ -1,0 +1,11 @@
+Phase 6 patch files:
+- PROJECT_PROGRESS.md
+- README_PHASE6_SETUP.md
+- backend/src/controllers/expenseController.js
+- backend/src/models/Expense.js
+- backend/src/routes/expenseRoutes.js
+- backend/src/server.js
+- frontend/src/App.jsx
+- frontend/src/components/Layout.jsx
+- frontend/src/pages/Expenses.jsx
+- frontend/src/services/api.js
