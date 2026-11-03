@@ -38,7 +38,6 @@ const invoiceSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
   status: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
   invoiceDate: { type: Date, default: Date.now }
-}, { timestamps: true });
-invoiceSchema.index({branchId:1,invoiceNo:1},{unique:true});
+}, { timestamps: true, optimisticConcurrency: true });
 invoiceSchema.index({branchId:1,invoiceNo:1},{unique:true});
 export default mongoose.model('Invoice', invoiceSchema);

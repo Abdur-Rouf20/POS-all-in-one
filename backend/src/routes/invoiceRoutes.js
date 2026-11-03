@@ -1,1 +1,12 @@
-import {Router} from 'express';import {listInvoices,getInvoice,createInvoice,updateInvoice} from '../controllers/invoiceController.js';import {authenticate,authorize,resolveBranch} from '../middleware/auth.js';const r=Router();r.use(authenticate,resolveBranch());r.get('/',authorize('invoice.view'),listInvoices);r.post('/',authorize('invoice.create'),createInvoice);r.get('/:id',authorize('invoice.view'),getInvoice);r.put('/:id',authorize('invoice.edit'),updateInvoice);export default r;
+import { Router } from 'express';
+import { listInvoices, getInvoice, createInvoice, updateInvoice, listInvoiceRevisions } from '../controllers/invoiceController.js';
+import { authenticate, authorize, resolveBranch } from '../middleware/auth.js';
+
+const r = Router();
+r.use(authenticate, resolveBranch());
+r.get('/', authorize('invoice.view'), listInvoices);
+r.post('/', authorize('invoice.create'), createInvoice);
+r.get('/:id/revisions', authorize('invoice.view'), listInvoiceRevisions);
+r.get('/:id', authorize('invoice.view'), getInvoice);
+r.put('/:id', authorize('invoice.edit'), updateInvoice);
+export default r;

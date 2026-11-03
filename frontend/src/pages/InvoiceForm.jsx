@@ -20,9 +20,11 @@ export default function InvoiceForm({ t, settings }) {
   const [form, setForm] = useState(() => initialForm(settings));
   const [error, setError] = useState('');
   const [customerMessage, setCustomerMessage] = useState('');
+  const [revisionReason, setRevisionReason] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (id && !isOwner) { setError('Only the owner can edit an invoice.'); return; }
     api.inventory().then(rows => setProducts(rows.filter(row => row.productId).map(row => ({ ...row.productId, branchQuantity: row.quantity })))).catch(e => setError(e.message));
     if (id) api.invoice(id).then(invoice => setForm({
       ...initialForm(settings), ...invoice,
@@ -31,8 +33,12 @@ export default function InvoiceForm({ t, settings }) {
       paidAmount: String(invoice.paidAmount || 0),
       paymentType: invoice.paymentType || 'cash',
       cashAmount: String(invoice.cashAmount || 0), banglaQrAmount: String(invoice.banglaQrAmount || 0)
-    })).catch(e => setError(e.message));
-  }, [id]);
+    })).then(invoice => {
+      [...new Set(invoice.items.map(item => String(item.product)))].forEach(productId => {
+        api.batches(productId).then(rows => setBatchOptions(current => ({ ...current, [productId]: rows }))).catch(() => {});
+      });
+    }).catch(e => setError(e.message));
+  }, [id, isOwner]);
 
   useEffect(() => {
     if (!id && settings?.taxRate !== undefined) setForm(current => ({ ...current, taxRate: current.taxRate || settings.taxRate }));
@@ -81,21 +87,24 @@ export default function InvoiceForm({ t, settings }) {
     event.preventDefault(); setError('');
     if (!form.items.length || form.items.some(item => !item.name || Number(item.quantity) <= 0)) { setError(t.noItems); return; }
     if (!form.customerName.trim() || !form.customerPhone.trim()) { setError('Customer name and phone number are required.'); return; }
-    if (paidAmount > total) { setError('Initial payment cannot exceed invoice total.'); return; }
-    if (!paymentMatches) { setError('Cash plus Bangla QR must equal the initial payment amount.'); return; }
+    if (id && revisionReason.trim().length < 5) { setError('Enter an edit reason with at least 5 characters.'); return; }
+    if (!id && paidAmount > total) { setError('Initial payment cannot exceed invoice total.'); return; }
+    if (!id && !paymentMatches) { setError('Cash plus Bangla QR must equal the initial payment amount.'); return; }
     setBusy(true);
     try {
       const body = {
         ...form,
         items: form.items.map(item => ({ ...item, quantity: Number(item.quantity), unitPrice: Number(item.unitPrice), ...(isOwner && item.batchId ? { batchId: item.batchId } : {}) })),
         discount: Number(form.discount) || 0, taxRate: Number(form.taxRate) || 0,
-        paidAmount, cashAmount, banglaQrAmount
+        ...(id ? { revisionReason: revisionReason.trim() } : { paidAmount, cashAmount, banglaQrAmount })
       };
       const saved = id ? await api.updateInvoice(id, body) : await api.createInvoice(body);
       navigate(`/invoices/${saved._id}`);
     } catch (e) { setError(e.message); }
     finally { setBusy(false); }
   }
+
+  if (id && !isOwner) return <div className="alert error">Only the owner can edit an invoice. Return to the invoice details page.</div>;
 
   return <>
     <div className="page-heading"><div><button className="back-link" onClick={() => navigate(-1)}><ArrowLeft size={16}/>{t.back}</button><h1>{id ? t.editInvoice : t.createInvoice}</h1><p className="muted">Customer details, items and initial payment.</p></div></div>
@@ -111,6 +120,7 @@ export default function InvoiceForm({ t, settings }) {
             <div className="field span-all"><label>{t.customerAddress}</label><input value={form.customerAddress || ''} onChange={e => setForm(current => ({ ...current, customerAddress: e.target.value }))}/></div>
           </div>
           {customerMessage && <p className="field-help">{customerMessage}</p>}
+          {id && <div className="field"><label>Reason for editing this invoice *</label><textarea rows="3" value={revisionReason} onChange={e => setRevisionReason(e.target.value)} minLength={5} maxLength={1000} placeholder="Explain why this invoice needs to be changed" required /></div>}
         </section>
         <section className="panel form-panel">
           <div className="panel-title"><span className="section-number">02</span><div><h2>{t.items}</h2><p className="muted">Choose products available in this branch.</p></div><button type="button" className="button secondary compact push-right" onClick={() => setForm(current => ({ ...current, items: [...current.items, blankItem()] }))}><Plus size={15}/>{t.addItem}</button></div>
@@ -125,7 +135,8 @@ export default function InvoiceForm({ t, settings }) {
           </div>)}</div>
         </section>
         <section className="panel form-panel">
-          <div className="panel-title"><span className="section-number">03</span><div><h2>Initial payment</h2><p className="muted">No further payments will be collected against this invoice after creation.</p></div></div>
+          <div className="panel-title"><span className="section-number">03</span><div><h2>{id ? 'Original payment (locked)' : 'Initial payment'}</h2><p className="muted">{id ? 'Invoice editing cannot change or collect another payment.' : 'This is the only payment recorded directly against the invoice.'}</p></div></div>
+          {id ? <div className="alert success">Original paid amount: {money(form.paidAmount)} · Cash: {money(form.cashAmount)} · Bangla QR: {money(form.banglaQrAmount)}. These values will remain unchanged.</div> : <>
           <div className="form-grid three">
             <div className="field"><label>Amount paid now</label><input type="number" min="0" max={total} step="0.01" value={form.paidAmount} onChange={e => setForm(current => ({ ...current, paidAmount: e.target.value }))} placeholder={money(total)}/></div>
             <div className="field"><label>Payment method</label><select value={form.paymentType} onChange={e => setForm(current => ({ ...current, paymentType: e.target.value, cashAmount: '', banglaQrAmount: '' }))}><option value="cash">Cash</option><option value="bangla_qr">Bangla QR</option><option value="mixed">Mixed payment</option></select></div>
@@ -133,10 +144,11 @@ export default function InvoiceForm({ t, settings }) {
           </div>
           {form.paymentType === 'mixed' && <div className="mixed-payment-box"><h3>Mixed payment</h3><p className="muted">Example: Customer pays using both methods.</p><div className="form-grid"><div className="field"><label>Cash</label><input type="number" min="0" step="0.01" value={form.cashAmount} onChange={e => setForm(current => ({ ...current, cashAmount: e.target.value }))}/></div><div className="field"><label>Bangla QR</label><input type="number" min="0" step="0.01" value={form.banglaQrAmount} onChange={e => setForm(current => ({ ...current, banglaQrAmount: e.target.value }))}/></div></div><div className="mixed-total"><strong>Total collected</strong><strong>{money(cashAmount + banglaQrAmount)}</strong></div><span className={`payment-match ${paymentMatches ? 'valid' : 'invalid'}`}>{paymentMatches ? 'Payment amounts match' : `Difference: ${money(paidAmount - cashAmount - banglaQrAmount)}`}</span></div>}
           {form.paymentType !== 'mixed' && <div className="alert success">{form.paymentType === 'cash' ? 'Cash' : 'Bangla QR'}: {money(paidAmount)}</div>}
+          </>}
           <div className="field"><label>{t.notes}</label><textarea rows="2" value={form.notes || ''} onChange={e => setForm(current => ({ ...current, notes: e.target.value }))}/></div>
         </section>
       </div>
-      <aside className="panel totals-panel"><div className="totals-heading"><span className="totals-icon"><Save size={18}/></span><div><h2>{t.invoiceDetails}</h2><p className="muted">Live calculation</p></div></div><div className="totals-row"><span>{t.subtotal}</span><strong>{money(subtotal)}</strong></div><div className="totals-row"><span>{t.discount}</span><strong>− {money(discount)}</strong></div><div className="totals-row"><span>{t.tax} ({Number(form.taxRate) || 0}%)</span><strong>{money(taxAmount)}</strong></div><div className="totals-grand"><span>{t.total}</span><strong>{money(total)}</strong></div><p className="muted totals-note">Tax is calculated on subtotal after discount.</p><button className="button primary full" disabled={busy || !paymentMatches}><Save size={17}/>{busy ? t.loading : id ? t.updateInvoice : t.save}</button><button type="button" className="button secondary full" onClick={() => navigate(-1)}>{t.cancel}</button></aside>
+      <aside className="panel totals-panel"><div className="totals-heading"><span className="totals-icon"><Save size={18}/></span><div><h2>{t.invoiceDetails}</h2><p className="muted">Live calculation</p></div></div><div className="totals-row"><span>{t.subtotal}</span><strong>{money(subtotal)}</strong></div><div className="totals-row"><span>{t.discount}</span><strong>− {money(discount)}</strong></div><div className="totals-row"><span>{t.tax} ({Number(form.taxRate) || 0}%)</span><strong>{money(taxAmount)}</strong></div><div className="totals-grand"><span>{t.total}</span><strong>{money(total)}</strong></div><p className="muted totals-note">Tax is calculated on subtotal after discount.</p><button className="button primary full" disabled={busy || (!id && !paymentMatches)}><Save size={17}/>{busy ? t.loading : id ? t.updateInvoice : t.save}</button><button type="button" className="button secondary full" onClick={() => navigate(-1)}>{t.cancel}</button></aside>
     </form>
   </>;
 }

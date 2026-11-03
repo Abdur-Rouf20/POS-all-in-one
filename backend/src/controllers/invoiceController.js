@@ -6,6 +6,7 @@ import Inventory from '../models/Inventory.js';
 import Batch from '../models/Batch.js';
 import StockMovement from '../models/StockMovement.js';
 import Payment from '../models/Payment.js';
+import InvoiceRevision from '../models/InvoiceRevision.js';
 import { actorOf, audit } from '../utils/audit.js';
 import { normalizePhone } from '../utils/phone.js';
 
@@ -48,7 +49,7 @@ async function resolveCustomer(body, user) {
   return customer;
 }
 
-async function normalize(body, branchId, user, old = null) {
+async function normalize(body, branchId, user, old = null, stockCredit = new Map()) {
   if (!Array.isArray(body.items) || !body.items.length) throw Object.assign(new Error('Add at least one item.'), { status: 400 });
   const customer = await resolveCustomer(body, user);
   const items = [];
@@ -62,14 +63,15 @@ async function normalize(body, branchId, user, old = null) {
     if (!Number.isFinite(quantity) || quantity <= 0) throw Object.assign(new Error('Quantity must be positive.'), { status: 400 });
     const unitPrice = raw.unitPrice === undefined ? product.price : Number(raw.unitPrice);
     if (!Number.isFinite(unitPrice) || unitPrice < 0) throw Object.assign(new Error('Invalid product price.'), { status: 400 });
-    const batchFilter = { branchId, productId: product._id, active: true, quantity: { $gt: 0 } };
+    const creditedBatchIds = [...stockCredit.keys()].filter(id => mongoose.isValidObjectId(id));
+    const batchFilter = { branchId, productId: product._id, active: true, $or: [{ quantity: { $gt: 0 } }, ...(creditedBatchIds.length ? [{ _id: { $in: creditedBatchIds } }] : [])] };
     let allocations = [];
     if (raw.batchId) {
       if (user.role !== 'owner') throw Object.assign(new Error('Only the owner can manually select a stock batch.'), { status: 403 });
       if (!mongoose.isValidObjectId(raw.batchId)) throw Object.assign(new Error('Invalid batch selection.'), { status: 400 });
       const batch = await Batch.findOne({ ...batchFilter, _id: raw.batchId }).select('+purchasePrice');
       const alreadyReserved = reserved.get(String(raw.batchId)) || 0;
-      if (!batch || batch.quantity - alreadyReserved < quantity) throw Object.assign(new Error(`Insufficient quantity in the selected batch for ${product.name}.`), { status: 400 });
+      if (!batch || batch.quantity + (stockCredit.get(String(batch._id)) || 0) - alreadyReserved < quantity) throw Object.assign(new Error(`Insufficient quantity in the selected batch for ${product.name}.`), { status: 400 });
       allocations = [{ batch, quantity }];
       reserved.set(String(batch._id), alreadyReserved + quantity);
     } else {
@@ -77,7 +79,7 @@ async function normalize(body, branchId, user, old = null) {
       let remaining = quantity;
       for (const batch of batches) {
         const alreadyReserved = reserved.get(String(batch._id)) || 0;
-        const available = Math.max(0, batch.quantity - alreadyReserved);
+        const available = Math.max(0, batch.quantity + (stockCredit.get(String(batch._id)) || 0) - alreadyReserved);
         if (!available) continue;
         const take = Math.min(available, remaining);
         allocations.push({ batch, quantity: take });
@@ -192,8 +194,179 @@ export async function createInvoice(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export async function updateInvoice(req, res) {
-  return res.status(409).json({
-    message: 'Invoice editing is temporarily paused while batch-level stock is being introduced. Owner-controlled editing with stock reconciliation and revision history will be enabled in Phase 4.'
-  });
+function revisionSnapshot(invoice) {
+  const value = invoice.toObject ? invoice.toObject() : invoice;
+  return {
+    invoiceNo: value.invoiceNo,
+    customerId: value.customerId,
+    customerName: value.customerName,
+    customerPhone: value.customerPhone,
+    customerAddress: value.customerAddress,
+    items: (value.items || []).map(item => ({
+      product: item.product, name: item.name, sku: item.sku,
+      quantity: item.quantity, unitPrice: item.unitPrice, lineTotal: item.lineTotal,
+      batchAllocations: (item.batchAllocations || []).map(allocation => ({
+        batchId: allocation.batchId, batchNo: allocation.batchNo,
+        quantity: allocation.quantity, unitCost: allocation.unitCost,
+        costStatus: allocation.costStatus, sellingPrice: allocation.sellingPrice
+      }))
+    })),
+    subtotal: value.subtotal, discount: value.discount, taxRate: value.taxRate,
+    taxAmount: value.taxAmount, total: value.total, notes: value.notes,
+    invoiceDate: value.invoiceDate
+  };
+}
+
+function allocationTotals(items) {
+  const totals = new Map();
+  for (const item of items || []) {
+    for (const allocation of item.batchAllocations || []) {
+      const key = String(allocation.batchId);
+      totals.set(key, (totals.get(key) || 0) + Number(allocation.quantity || 0));
+    }
+  }
+  return totals;
+}
+
+async function refreshInventory(branchId, productIds, user) {
+  for (const productId of productIds) {
+    const totals = await Batch.aggregate([
+      { $match: { branchId: new mongoose.Types.ObjectId(branchId), productId: new mongoose.Types.ObjectId(productId), active: true } },
+      { $group: { _id: null, quantity: { $sum: '$quantity' } } }
+    ]);
+    await Inventory.updateOne(
+      { branchId, productId },
+      { $set: { quantity: round(totals[0]?.quantity || 0), updatedBy: actorOf(user) } },
+      { upsert: true }
+    );
+  }
+}
+
+export async function updateInvoice(req, res, next) {
+  const appliedBatchDeltas = [];
+  const createdMovementIds = [];
+  let originalInvoice = null;
+  let savedInvoice = null;
+  let createdRevision = null;
+  let affectedProducts = new Set();
+  try {
+    if (req.user.role !== 'owner') return res.status(403).json({ message: 'Only the owner can edit an invoice.' });
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid invoice ID.' });
+    const reason = String(req.body.revisionReason || '').trim();
+    if (reason.length < 5) return res.status(400).json({ message: 'Enter an edit reason with at least 5 characters.' });
+
+    const invoice = await Invoice.findOne({ _id: req.params.id, branchId: req.branchId });
+    if (!invoice) return res.status(404).json({ message: 'Invoice not found in this branch.' });
+    originalInvoice = invoice.toObject({ depopulate: true });
+    const before = revisionSnapshot(invoice);
+    const originalPaidAmount = invoice.paidAmount;
+    const originalCashAmount = invoice.cashAmount;
+    const originalQrAmount = invoice.banglaQrAmount;
+
+    const oldAllocations = allocationTotals(invoice.items);
+    for (const item of invoice.items) {
+      const allocated = (item.batchAllocations || []).reduce((sum, allocation) => sum + Number(allocation.quantity || 0), 0);
+      if (!item.batchAllocations?.length || Math.abs(allocated - Number(item.quantity)) > 0.0001) {
+        return res.status(409).json({ message: `Invoice ${invoice.invoiceNo} has incomplete legacy batch allocation data. It cannot be edited safely; leave it unchanged.` });
+      }
+      affectedProducts.add(String(item.product));
+    }
+    const stockCredit = oldAllocations;
+    const data = await normalize(req.body, req.branchId, req.user, invoice, stockCredit);
+    if (data.total < originalPaidAmount) {
+      return res.status(400).json({ message: `The revised total cannot be lower than the original initial payment (${originalPaidAmount.toFixed(2)}).` });
+    }
+    // The original collection is immutable. Editing only recalculates the remaining due.
+    data.paidAmount = originalPaidAmount;
+    data.cashAmount = originalCashAmount;
+    data.banglaQrAmount = originalQrAmount;
+    data.paymentType = invoice.paymentType;
+    data.dueAmount = round(data.total - originalPaidAmount);
+    data.paymentStatus = originalPaidAmount >= data.total ? 'paid' : originalPaidAmount > 0 ? 'partial' : 'unpaid';
+    data.status = data.paymentStatus === 'paid' ? 'paid' : 'unpaid';
+
+    const newAllocations = allocationTotals(data.items);
+    const allBatchIds = new Set([...oldAllocations.keys(), ...newAllocations.keys()]);
+    const batchDeltas = [];
+    for (const batchId of allBatchIds) {
+      const delta = round((newAllocations.get(batchId) || 0) - (oldAllocations.get(batchId) || 0));
+      if (!delta) continue;
+      const batch = await Batch.findOne({ _id: batchId, branchId: req.branchId });
+      if (!batch) throw Object.assign(new Error('A stock batch used by this invoice no longer exists in this branch.'), { status: 409 });
+      const productId = String(batch.productId);
+      affectedProducts.add(productId);
+      batchDeltas.push({ batchId, productId, batchNo: batch.batchNo, delta });
+    }
+
+    // Apply net quantity changes with guarded decrements. Existing sale movements remain
+    // immutable; new adjustment movements record the correction made by this revision.
+    for (const change of batchDeltas) {
+      const filter = { _id: change.batchId, branchId: req.branchId };
+      if (change.delta > 0) filter.quantity = { $gte: change.delta };
+      const updated = await Batch.findOneAndUpdate(
+        filter,
+        { $inc: { quantity: -change.delta } },
+        { new: true }
+      );
+      if (!updated) throw Object.assign(new Error(`Insufficient remaining stock in batch ${change.batchNo}. Refresh stock and try again.`), { status: 409 });
+      appliedBatchDeltas.push(change);
+      const movement = await StockMovement.create({
+        branchId: req.branchId, productId: change.productId, batchId: change.batchId,
+        batchNo: change.batchNo, type: 'adjustment', quantity: -change.delta,
+        beforeQuantity: round(updated.quantity + change.delta), afterQuantity: updated.quantity,
+        referenceType: 'Invoice', referenceId: invoice._id,
+        note: `Invoice ${invoice.invoiceNo} revised: ${reason}`,
+        actor: actorOf(req.user)
+      });
+      createdMovementIds.push(movement._id);
+    }
+
+    invoice.set(data);
+    savedInvoice = await invoice.save();
+    const latestRevision = await InvoiceRevision.findOne({ invoiceId: invoice._id }).sort({ revisionNo: -1 }).select('revisionNo');
+    createdRevision = await InvoiceRevision.create({
+      invoiceId: invoice._id, invoiceNo: invoice.invoiceNo, branchId: req.branchId,
+      revisionNo: (latestRevision?.revisionNo || 0) + 1, reason,
+      changedBy: actorOf(req.user), before, after: revisionSnapshot(savedInvoice)
+    });
+    await refreshInventory(req.branchId, affectedProducts, req.user);
+    await audit(req, 'invoice.update', 'Invoice', invoice._id, {
+      invoiceNo: invoice.invoiceNo, revisionId: createdRevision._id,
+      revisionNo: createdRevision.revisionNo, reason,
+      previousTotal: before.total, updatedTotal: savedInvoice.total,
+      originalPaidAmount, dueAmount: savedInvoice.dueAmount
+    });
+    return res.json(safeInvoiceForUser(savedInvoice, req.user));
+  } catch (error) {
+    // Compensating rollback for this standalone MongoDB deployment. We deliberately
+    // retain historical movements only after a successful revision; failed attempts
+    // remove their new movements and restore the previous quantities/document.
+    try {
+      if (createdRevision) await InvoiceRevision.deleteOne({ _id: createdRevision._id });
+      if (savedInvoice && originalInvoice) {
+        await Invoice.replaceOne({ _id: originalInvoice._id, branchId: req.branchId }, originalInvoice, { overwrite: true });
+      }
+      if (createdMovementIds.length) await StockMovement.deleteMany({ _id: { $in: createdMovementIds } });
+      for (const change of [...appliedBatchDeltas].reverse()) {
+        await Batch.updateOne({ _id: change.batchId, branchId: req.branchId }, { $inc: { quantity: change.delta } });
+      }
+      if (affectedProducts.size) await refreshInventory(req.branchId, affectedProducts, req.user);
+    } catch (rollbackError) {
+      console.error('Invoice revision rollback failed:', rollbackError);
+      return res.status(500).json({ message: 'Invoice edit failed and automatic stock rollback needs attention. Stop further sales for the affected products and contact the system administrator.' });
+    }
+    return next(error);
+  }
+}
+
+export async function listInvoiceRevisions(req, res, next) {
+  try {
+    if (req.user.role !== 'owner') return res.status(403).json({ message: 'Only the owner can view invoice revision history.' });
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid invoice ID.' });
+    const invoice = await Invoice.findOne({ _id: req.params.id, branchId: req.branchId }).select('_id invoiceNo');
+    if (!invoice) return res.status(404).json({ message: 'Invoice not found in this branch.' });
+    const revisions = await InvoiceRevision.find({ invoiceId: invoice._id, branchId: req.branchId })
+      .sort({ revisionNo: -1 }).limit(100).lean();
+    res.json(revisions);
+  } catch (error) { next(error); }
 }

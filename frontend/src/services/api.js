@@ -51,6 +51,7 @@ export const api = {
   invoice: id => request(`/invoices/${id}`),
   createInvoice: body => request('/invoices', { method: 'POST', body: JSON.stringify(body) }),
   updateInvoice: (id, body) => request(`/invoices/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  invoiceRevisions: id => request(`/invoices/${id}/revisions`),
   payments: id => request(`/payments/invoices/${id}`),
   settings: () => request('/settings'),
   updateSettings: body => request('/settings', { method: 'PUT', body: JSON.stringify(body) })
