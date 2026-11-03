@@ -15,6 +15,7 @@ import branchRoutes from './routes/branchRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';import paymentRoutes from './routes/paymentRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import moneyReceiptRoutes from './routes/moneyReceiptRoutes.js';
+import salesReturnRoutes from './routes/salesReturnRoutes.js';
 import { summary } from './controllers/dashboardController.js';
 import { authenticate, resolveBranch } from './middleware/auth.js';
 
@@ -32,16 +33,17 @@ dotenv.config(); const app = express();
         app.use('/api/payments', paymentRoutes);
          app.use('/api/customers', customerRoutes);
          app.use('/api/money-receipts', moneyReceiptRoutes);
+         app.use('/api/returns', salesReturnRoutes);
          app.use('/api/settings', settingsRoutes);
           app.get('/api/dashboard/summary', authenticate, resolveBranch({ allowAllForOwner: true }), summary);
 
 app.use((err, req, res, next) => { console.error(err);
-     const status = err.status || (err.code === 11000 ? 409 : 500);
+const status = err.status || (err.code === 11000 ? 409 : 500);
       res.status(status).json({ message: err.code === 11000 ? 'A record with this unique value already exists.' : err.message || 'Internal server error.' }); });
 async function seedOwner() { if (await User.exists({ role: 'owner' })) return;
- if (!process.env.OWNER_EMAIL || !process.env.OWNER_PASSWORD || !process.env.JWT_SECRET) throw new Error('Set OWNER_EMAIL, OWNER_PASSWORD and JWT_SECRET in the environment before first startup.'); 
+    if (!process.env.OWNER_EMAIL || !process.env.OWNER_PASSWORD || !process.env.JWT_SECRET) throw new Error('Set OWNER_EMAIL, OWNER_PASSWORD and JWT_SECRET in the environment before first startup.'); 
  let branch = await Branch.findOne({ code: 'MAIN' }); 
- if (!branch) branch = await Branch.create({ name: process.env.DEFAULT_BRANCH_NAME || 'Main Branch', code: 'MAIN' }); await User.create({ name: process.env.OWNER_NAME || 'Shop Owner', email: process.env.OWNER_EMAIL, passwordHash: await bcrypt.hash(process.env.OWNER_PASSWORD, 12), role: 'owner', branchId: null, permissions: [] }); console.log(`Initial owner created: ${process.env.OWNER_EMAIL}`); }
+    if (!branch) branch = await Branch.create({ name: process.env.DEFAULT_BRANCH_NAME || 'Main Branch', code: 'MAIN' }); await User.create({ name: process.env.OWNER_NAME || 'Shop Owner', email: process.env.OWNER_EMAIL, passwordHash: await bcrypt.hash(process.env.OWNER_PASSWORD, 12), role: 'owner', branchId: null, permissions: [] }); console.log(`Initial owner created: ${process.env.OWNER_EMAIL}`); }
 const port = process.env.PORT || 5000; connectDB().then(seedOwner).then(() => app.listen(port, () => console.log(`POS API listening on ${port}`))).catch(err => { console.error('Startup failed:', err.message);
     process.exit(1);
  });

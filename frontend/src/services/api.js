@@ -32,6 +32,9 @@ export const api = {
   moneyReceipts: (customerId = '') => request(`/money-receipts${customerId ? `?customerId=${encodeURIComponent(customerId)}` : ''}`),
   createMoneyReceipt: body => request('/money-receipts', { method: 'POST', body: JSON.stringify(body) }),
   moneyReceipt: id => request(`/money-receipts/${id}`),
+  salesReturns: (invoiceId = '') => request(`/returns${invoiceId ? `?invoiceId=${encodeURIComponent(invoiceId)}` : ''}`),
+  createSalesReturn: body => request('/returns', { method: 'POST', body: JSON.stringify(body) }),
+  salesReturn: id => request(`/returns/${id}`),
 
   dashboard: () => request('/dashboard/summary'),
   categories: (includeInactive = false) => request(`/categories${includeInactive ? '?includeInactive=true' : ''}`),

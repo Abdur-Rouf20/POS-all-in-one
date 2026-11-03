@@ -13,7 +13,8 @@ import {
   GitBranch,
   Users,
   ContactRound,
-  Wallet
+  Wallet,
+  RotateCcw
 } from 'lucide-react';
 
 export default function Layout({ lang, setLang, t, user }) {
@@ -74,6 +75,11 @@ export default function Layout({ lang, setLang, t, user }) {
           <NavLink to="/money-receipts">
             <Wallet size={18} />
             Money Receipts
+          </NavLink>
+
+          <NavLink to="/returns">
+            <RotateCcw size={18} />
+            Sales Returns
           </NavLink>
 
           <NavLink to="/customers">

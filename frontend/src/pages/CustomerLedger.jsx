@@ -31,18 +31,20 @@ export default function CustomerLedger({ settings }) {
         <div className="stat-card"><span className="stat-label">Invoice total</span><div className="stat-value">{money(summary.invoiceTotal)}</div></div>
         <div className="stat-card"><span className="stat-label">Invoice outstanding</span><div className="stat-value">{money(summary.invoiceOutstanding)}</div></div>
         <div className="stat-card"><span className="stat-label">Money receipts</span><div className="stat-value">{money(summary.moneyReceipts)}</div></div>
+        <div className="stat-card"><span className="stat-label">Due adjustments</span><div className="stat-value">{money(summary.dueAdjustments)}</div></div>
+        <div className="stat-card"><span className="stat-label">Customer credit</span><div className="stat-value">{money(summary.customerCredits)}</div></div>
         <div className="stat-card"><span className="stat-label">Grand due</span><div className="stat-value">{money(summary.grandDue)}</div></div>
       </div>
       <section className="panel">
         <div className="panel-head"><div><h2>Customer transaction history</h2><p className="muted">Invoices and money receipts are separate documents.</p></div></div>
         <div className="table-wrap">
-          <table><thead><tr><th>Type</th><th>Document</th><th>Date & time</th><th className="right">Amount</th><th className="right">Invoice due</th></tr></thead>
+          <table><thead><tr><th>Type</th><th>Document</th><th>Date & time</th><th className="right">Amount</th><th className="right">Invoice due / settlement</th></tr></thead>
             <tbody>{transactions.map(row => <tr key={`${row.type}-${row.id}`}>
-              <td><span className={`status ${row.type === 'invoice' ? 'paid' : 'unpaid'}`}>{row.type === 'invoice' ? 'Invoice' : 'Money Receipt'}</span></td>
+              <td><span className={`status ${row.type === 'invoice' ? 'paid' : row.type === 'sales_return' ? 'partial' : 'unpaid'}`}>{row.type === 'invoice' ? 'Invoice' : row.type === 'money_receipt' ? 'Money Receipt' : 'Sales Return'}</span></td>
               <td>{row.type === 'invoice' ? <Link className="invoice-link" to={`/invoices/${row.id}`}>{row.number}</Link> : row.number}</td>
               <td>{new Date(row.date).toLocaleString()}</td>
               <td className="right amount">{money(row.amount)}</td>
-              <td className="right">{row.type === 'invoice' ? money(row.due) : '—'}</td>
+              <td className="right">{row.type === 'invoice' ? money(row.due) : row.type === 'sales_return' ? (row.settlementType === 'due_adjustment' ? 'Due adjusted' : row.settlementType === 'customer_credit' ? 'Credit issued' : 'Refunded') : '—'}</td>
             </tr>)}
             {!transactions.length && <tr><td colSpan="5" className="empty-cell"><ReceiptText size={24}/><p>No transactions found.</p></td></tr>}</tbody>
           </table>

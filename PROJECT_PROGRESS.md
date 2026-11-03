@@ -2,30 +2,29 @@
 
 Last updated: 2026-11-03
 
-## Completed phases
+## Completed / delivered phases
 - Phase 1: project foundation and initial POS application.
 - Phase 2: branch-aware POS functionality and supporting modules.
 - Phase 3: batch-level inventory, FIFO allocation, customer accounts, money receipts, and related functionality.
+- Phase 4 patch delivered: owner-only invoice editing, mandatory revision reason, batch stock reconciliation, immutable initial payment, revision history and audit logging. Local functional verification remains required.
 
-## Phase 4 — implemented source changes
-- Owner-only invoice editing (backend enforced).
-- Mandatory revision reason.
-- Batch allocation stock reconciliation.
-- Original invoice payment fields and payment records are immutable during editing.
-- Before/after revision snapshots, editor, reason, timestamp, and revision number.
-- Owner-only revision-history API and UI.
-- Salesman does not see the invoice edit action.
-- Legacy invoices with incomplete batch allocations are blocked from editing safely.
+## Phase 5 — Sales returns and refunds patch
+- Returns reference an existing invoice in the active branch.
+- Partial returns and cumulative return-quantity limits.
+- Manual refund price per returned invoice line.
+- Returned stock is restored to the original sold batch allocations.
+- Return stock movements reference the return record.
+- Settlement choices: customer credit, due adjustment, cash/Bangla QR/mixed refund.
+- Customer ledger includes returns, due adjustments and customer credit totals.
 
-## Verification status
-- Backend JavaScript syntax checks: passed.
-- Frontend JavaScript/JSX parsing checks: passed.
-- Full Vite production build: not run in this environment because dependency installation did not complete.
-- Docker build/runtime and live MongoDB integration tests: not run in this environment because Docker is unavailable here.
-- Therefore Phase 4 source is prepared, but it still requires the user's local Docker build and functional checklist before being marked fully verified.
+## Phase 5 verification status
+- Source files prepared.
+- Syntax checks and frontend production build status are recorded in the delivery message; local Docker/MongoDB functional tests remain required.
+- Customer credit is recorded but not automatically redeemed in later transactions.
+- Standalone MongoDB does not provide multi-document transactions; avoid concurrent financial/stock operations until transaction support is implemented.
 
-## Important architecture note
-The current Compose MongoDB service is standalone. This Phase 4 implementation uses guarded writes and compensating rollback rather than MongoDB multi-document transactions. Avoid concurrent invoice editing/sales against the same affected stock until the database is configured as a replica set and the workflow is migrated to transactions.
-
-## Next
-Run the Phase 4 setup and verification checklist. Record any issues before starting Phase 5.
+## Next phases
+- Phase 6: expense tracker.
+- Phase 7: dashboard and analytical reporting (sales, profit, product/branch performance, payment methods, expenses and shop worth).
+- Phase 8: flexible saved/custom reports and branch/month/year report combinations.
+- Final phase: CSS/UI polish after functional phases are complete.

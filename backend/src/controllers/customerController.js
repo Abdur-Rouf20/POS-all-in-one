@@ -1,6 +1,7 @@
 import Customer from '../models/Customer.js';
 import Invoice from '../models/Invoice.js';
 import MoneyReceipt from '../models/MoneyReceipt.js';
+import SalesReturn from '../models/SalesReturn.js';
 import { actorOf, audit } from '../utils/audit.js';
 import { normalizePhone } from '../utils/phone.js';
 
@@ -56,17 +57,22 @@ export async function customerLedger(req, res, next) {
     const customer = await Customer.findById(req.params.id);
     if (!customer) return res.status(404).json({ message: 'Customer not found.' });
     const branchFilter = req.user.role === 'owner' ? {} : { branchId: req.user.branchId };
-    const [invoices, receipts] = await Promise.all([
+    const [invoices, receipts, returns] = await Promise.all([
       Invoice.find({ customerId: customer._id, ...branchFilter }).sort({ createdAt: -1 }).limit(500),
-      MoneyReceipt.find({ customerId: customer._id, ...branchFilter }).sort({ createdAt: -1 }).limit(500)
+      MoneyReceipt.find({ customerId: customer._id, ...branchFilter }).sort({ createdAt: -1 }).limit(500),
+      SalesReturn.find({ customerId: customer._id, ...branchFilter }).sort({ createdAt: -1 }).limit(500)
     ]);
     const invoiceDue = invoices.reduce((sum, invoice) => sum + Number(invoice.dueAmount || 0), 0);
     const receiptTotal = receipts.reduce((sum, receipt) => sum + Number(receipt.amount || 0), 0);
-    const grandDue = Math.round((invoiceDue - receiptTotal) * 100) / 100;
+    const dueAdjustments = returns.filter(row => row.settlementType === 'due_adjustment').reduce((sum, row) => sum + Number(row.totalRefund || 0), 0);
+    const customerCredits = returns.filter(row => row.settlementType === 'customer_credit').reduce((sum, row) => sum + Number(row.totalRefund || 0), 0);
+    const cashRefunds = returns.filter(row => row.settlementType === 'cash_refund').reduce((sum, row) => sum + Number(row.totalRefund || 0), 0);
+    const grandDue = Math.round((invoiceDue - receiptTotal - dueAdjustments) * 100) / 100;
     const transactions = [
       ...invoices.map(invoice => ({ type: 'invoice', id: invoice._id, number: invoice.invoiceNo, date: invoice.createdAt, amount: invoice.total, due: invoice.dueAmount, paidAtCreation: invoice.paidAmount })),
-      ...receipts.map(receipt => ({ type: 'money_receipt', id: receipt._id, number: receipt.receiptNo, date: receipt.createdAt, amount: receipt.amount, cashAmount: receipt.cashAmount, banglaQrAmount: receipt.banglaQrAmount }))
+      ...receipts.map(receipt => ({ type: 'money_receipt', id: receipt._id, number: receipt.receiptNo, date: receipt.createdAt, amount: receipt.amount, cashAmount: receipt.cashAmount, banglaQrAmount: receipt.banglaQrAmount })),
+      ...returns.map(row => ({ type: 'sales_return', id: row._id, number: row.returnNo, date: row.createdAt, amount: row.totalRefund, settlementType: row.settlementType, invoiceNo: row.invoiceNo }))
     ].sort((a, b) => new Date(b.date) - new Date(a.date));
-    res.json({ customer, summary: { invoiceCount: invoices.length, invoiceTotal: invoices.reduce((s, x) => s + x.total, 0), invoiceOutstanding: invoiceDue, moneyReceipts: receiptTotal, grandDue }, transactions, invoices, receipts });
+    res.json({ customer, summary: { invoiceCount: invoices.length, invoiceTotal: invoices.reduce((s, x) => s + x.total, 0), invoiceOutstanding: invoiceDue, moneyReceipts: receiptTotal, dueAdjustments, customerCredits, cashRefunds, grandDue }, transactions, invoices, receipts, returns });
   } catch (error) { next(error); }
 }
