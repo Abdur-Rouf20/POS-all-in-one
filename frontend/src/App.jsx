@@ -21,6 +21,7 @@ import MoneyReceipts from './pages/MoneyReceipts.jsx';
 import MoneyReceiptDetail from './pages/MoneyReceiptDetail.jsx';
 import SalesReturns from './pages/SalesReturns.jsx';
 import Expenses from './pages/Expenses.jsx';
+import Reports from './pages/Reports.jsx';
 
 import { translations } from './i18n.js';
 import { api } from './services/api.js';
@@ -151,6 +152,11 @@ export default function App() {
           <Route
             index
             element={<Dashboard t={t} settings={settings} />}
+          />
+
+          <Route
+            path="reports"
+            element={<Reports settings={settings} user={user} />}
           />
 
           <Route

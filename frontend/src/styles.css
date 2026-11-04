@@ -1685,3 +1685,37 @@ tbody tr:hover {
 @media (max-width: 760px) { .batch-row { align-items: flex-start; flex-direction: column; } .batch-cost-editor { width: 100%; } }
 
 .metric-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border,#e5e7eb)}
+
+
+/* Phase 8: reports, exports and print layouts */
+.dashboard-actions,.report-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.report-filter-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.report-filter-grid label{display:grid;gap:6px;min-width:150px}
+.report-all-branches{display:flex!important;align-items:center;gap:8px;padding-bottom:9px}
+.report-all-branches input{width:auto}
+.report-print-header,.dashboard-print-header{display:none}
+.report-summary{margin:14px 0}
+.report-summary .stat-card{display:flex;flex-direction:column;gap:8px}
+.report-summary .stat-card strong{font-size:19px}
+.report-categories{margin-bottom:16px}
+.report-footnote{font-size:12px;margin-top:12px}
+.report-table-panel .table-wrap{overflow-x:auto}
+.report-table-panel table{min-width:760px}
+@media(max-width:760px){.dashboard-actions,.report-actions{width:100%}.dashboard-actions .button,.report-actions .button{flex:1}.report-filter-grid label{min-width:100%}}
+@media print{
+  @page{size:landscape;margin:12mm}
+  body{background:#fff!important;color:#111!important}
+  .sidebar,.topbar,.branch-strip,.no-print,.sidebar-bottom,.error-banner{display:none!important}
+  .app-shell,.main,.page-wrap{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+  .panel,.stat-card{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+  .report-print-header,.dashboard-print-header{display:block!important;margin:0 0 14px}
+  .dashboard-print-header h1{font-size:20px;margin:0 0 5px}
+  .dashboard-print-header p{font-size:10px;margin:3px 0;color:#555}
+  .report-print-header h1{font-size:20px;margin:0 0 5px}
+  .report-print-header p{font-size:10px;margin:3px 0;color:#555}
+  .report-summary{grid-template-columns:repeat(4,1fr)!important}
+  .table-wrap{overflow:visible!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{font-size:9px!important;padding:5px!important;border:1px solid #ddd!important}
+  .report-footnote{font-size:9px}
+}

@@ -1,0 +1,11 @@
+PHASE 8 PATCH MANIFEST
+CREATE backend/src/controllers/reportController.js
+CREATE backend/src/routes/reportRoutes.js
+REPLACE backend/src/server.js
+CREATE frontend/src/pages/Reports.jsx
+REPLACE frontend/src/App.jsx
+REPLACE frontend/src/components/Layout.jsx
+REPLACE frontend/src/services/api.js
+REPLACE frontend/src/pages/Dashboard.jsx
+REPLACE frontend/src/styles.css
+No package.json changes. No database migration.

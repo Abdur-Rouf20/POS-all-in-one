@@ -15,7 +15,8 @@ import {
   ContactRound,
   Wallet,
   RotateCcw,
-  WalletCards
+  WalletCards,
+  FileSpreadsheet
 } from 'lucide-react';
 
 export default function Layout({ lang, setLang, t, user }) {
@@ -42,6 +43,11 @@ export default function Layout({ lang, setLang, t, user }) {
           <NavLink to="/" end>
             <LayoutDashboard size={18} />
             {t.dashboard}
+          </NavLink>
+
+          <NavLink to="/reports">
+            <FileSpreadsheet size={18} />
+            Reports
           </NavLink>
 
           <NavLink to="/products">
