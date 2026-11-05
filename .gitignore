@@ -2,3 +2,9 @@ node_modules
 .env
 .DS_Store
 dist
+
+# Playwright / automated test output
+**/node_modules/
+tests/ui/.env
+tests/ui/playwright-report/
+tests/ui/test-results/
