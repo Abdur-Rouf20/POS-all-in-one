@@ -1,0 +1,19 @@
+Phase 9 — Playwright UI Automation Foundation
+
+Added:
+- tests/ui/package.json
+- tests/ui/.env.example
+- tests/ui/playwright.config.js
+- tests/ui/fixtures/auth.js
+- tests/ui/pages/LoginPage.js
+- tests/ui/tests/health.spec.js
+- tests/ui/tests/auth.spec.js
+- tests/ui/tests/owner-navigation.spec.js
+- tests/ui/tests/salesman-access.spec.js
+- tests/ui/README.md
+- PHASE9_SETUP.md
+
+Modified:
+- .gitignore (ignore Playwright dependencies, credentials and generated output)
+
+No application source, database, Docker Compose, or npm application dependencies are changed.
