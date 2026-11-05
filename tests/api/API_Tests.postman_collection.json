@@ -1,0 +1,252 @@
+{
+  "info": {
+    "_postman_id": "8f3c7b10-4a21-4d5a-9f10-000000000010",
+    "name": "POS MVP - Phase 10 API Tests",
+    "description": "Initial non-destructive API automation suite based only on backend endpoints and response behavior confirmed from the supplied source files.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "api_base_url",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/api/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Health status is ok', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('ok');",
+                  "  pm.expect(body.service).to.eql('pos-api');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Authentication",
+      "item": [
+        {
+          "name": "Owner login - valid credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('Token and user are returned', function () {",
+                  "  pm.expect(body).to.have.property('token').that.is.a('string').and.not.empty;",
+                  "  pm.expect(body).to.have.property('user');",
+                  "  pm.expect(body.user).to.have.property('id');",
+                  "  pm.expect(body.user).to.have.property('email');",
+                  "  pm.expect(body.user).to.have.property('role');",
+                  "  pm.expect(body.user).to.not.have.property('passwordHash');",
+                  "});",
+                  "if (body.token) pm.collectionVariables.set('access_token', body.token);",
+                  "if (body.user && body.user.role) pm.collectionVariables.set('logged_in_role', body.user.role);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{owner_email}}\",\n  \"password\": \"{{owner_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login - incorrect password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Expected authentication error is returned', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.message).to.eql('Email or password is incorrect.');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{owner_email}}\",\n  \"password\": \"Definitely-Wrong-Password-For-Test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login - missing credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Expected authentication error is returned', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.message).to.eql('Email or password is incorrect.');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{api_base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Get current user - valid token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('Profile contains expected user fields', function () {",
+                  "  ['id', 'name', 'email', 'role', 'branchId', 'permissions'].forEach(function (key) {",
+                  "    pm.expect(body).to.have.property(key);",
+                  "  });",
+                  "  pm.expect(body).to.not.have.property('passwordHash');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": "{{api_base_url}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Get current user - no token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Authentication required message is returned', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql('Authentication required.');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{api_base_url}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Get current user - invalid token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Invalid token message is returned', function () {",
+                  "  pm.expect(pm.response.json().message).to.eql('Invalid or expired login token.');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.token.value"
+              }
+            ],
+            "url": "{{api_base_url}}/api/auth/me"
+          }
+        }
+      ]
+    }
+  ]
+}
