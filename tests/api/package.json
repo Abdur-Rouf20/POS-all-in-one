@@ -4,10 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "scripts": {
-  "test": "newman run API_Tests.postman_collection.json -e POS_Local.private.postman_environment.json"
+    "test": "newman run API_Tests.postman_collection.json -e POS_Local.private.postman_environment.json"
 },
   "keywords": [],
   "author": "",
