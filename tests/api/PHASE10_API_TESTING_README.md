@@ -1,5 +1,9 @@
-# Phase 10 — API Testing (Initial Suite)
+# to run the test type: npm test.
+# to run the report: Start-Process .\reports\newman-report.html 
 
+
+
+# Phase 10 — API Testing (Initial Suite)
 ## Files
 - `POS_Phase10_API_Tests.postman_collection.json` — Postman collection.
 - `POS_Local.postman_environment.json` — local environment template.
@@ -13,6 +17,8 @@
 
 ## Run order
 Run the collection in order. The valid login request stores its token in the collection variable `access_token`; the `/api/auth/me` valid-token request uses it.
+
+
 
 ## Included tests
 - `GET /api/health`
