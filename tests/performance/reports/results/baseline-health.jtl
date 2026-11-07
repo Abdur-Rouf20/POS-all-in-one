@@ -1,0 +1,11 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1793981756406,8,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,8,0,2
+1793981756415,3,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,3,0,0
+1793981756418,4,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,4,0,0
+1793981756423,3,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,3,0,0
+1793981756426,2,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,2,0,0
+1793981756429,2,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,2,0,0
+1793981756431,2,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,2,0,0
+1793981756433,2,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,1,0,0
+1793981756435,1,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,1,0,0
+1793981756437,1,Health Check,200,OK,Basline - Health API 1-1,text,true,,284,126,1,1,http://localhost:5000/api/health,1,0,0
