@@ -1,0 +1,24 @@
+email,password
+owner@example.com,ChangeThisPassword123!
+
+
+
+$jmeter = "D:\apache-jmeter-5.6.3\bin"
+
+$plan = ".\tests\performance\test-plans\POS_Authenticated_API_Recording.jmx"
+
+$jtl = ".\tests\performance\reports\results\authenticated-smoke.jtl"
+
+# Verify JMeter installation
+Test-Path $jmeter
+
+# Remove only the previous smoke-test result
+if (Test-Path $jtl) {
+    Remove-Item $jtl
+}
+
+# Execute JMeter in non-GUI mode and save JTL
+& $jmeter -n -t $plan -l $jtl
+
+# Check execution status
+$LASTEXITCODE

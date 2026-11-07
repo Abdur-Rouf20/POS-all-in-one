@@ -1,0 +1,20 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1794070246571,391,api_authentication/api/auth/login-53,200,OK,Thread Group 1-1,text,true,,624,578,1,1,http://localhost:5000/api/auth/login,391,0,31
+1794070246990,12,api_authentication/api/reports-39,200,OK,Thread Group 1-1,text,true,,1744,694,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-07,12,0,0
+1794070247003,7,api_authentication/api/categories-41,200,OK,Thread Group 1-1,text,true,,734,657,1,1,http://localhost:5000/api/categories,7,0,0
+1794070247011,8,api_authentication/api/products-40,200,OK,Thread Group 1-1,text,true,,1176,676,1,1,http://localhost:5000/api/products?includeInactive=true,8,0,0
+1794070247020,10,api_authentication/api/products-43,200,OK,Thread Group 1-1,text,true,,1176,656,1,1,http://localhost:5000/api/products,10,0,0
+1794070247030,9,api_authentication/api/inventory/batches-44,200,OK,Thread Group 1-1,text,true,,3744,665,1,1,http://localhost:5000/api/inventory/batches,9,0,0
+1794070247040,15,api_authentication/api/inventory-42,200,OK,Thread Group 1-1,text,true,,2795,657,1,1,http://localhost:5000/api/inventory,15,0,0
+1794070247056,7,api_authentication/api/categories-45,200,OK,Thread Group 1-1,text,true,,734,680,1,1,http://localhost:5000/api/categories?includeInactive=true,7,0,0
+1794070247064,7,api_authentication/api/expenses-46,200,OK,Thread Group 1-1,text,true,,340,655,1,1,http://localhost:5000/api/expenses,7,0,0
+1794070247071,7,api_authentication/api/money-receipts-47,200,OK,Thread Group 1-1,text,true,,801,667,1,1,http://localhost:5000/api/money-receipts,7,0,0
+1794070247078,8,api_authentication/api/invoices-48,200,OK,Thread Group 1-1,text,true,,4435,654,1,1,http://localhost:5000/api/invoices,8,0,0
+1794070247086,6,api_authentication/api/returns-49,200,OK,Thread Group 1-1,text,true,,249,653,1,1,http://localhost:5000/api/returns,6,0,0
+1794070247092,7,api_authentication/api/customers-50,200,OK,Thread Group 1-1,text,true,,1468,657,1,1,http://localhost:5000/api/customers,7,0,0
+1794070247099,8,api_authentication/api/invoices-51,200,OK,Thread Group 1-1,text,true,,4435,655,1,1,http://localhost:5000/api/invoices,8,0,0
+1794070247108,5,api_authentication/api/settings-52,200,OK,Thread Group 1-1,text,true,,519,655,1,1,http://localhost:5000/api/settings,5,0,0
+1794070247114,5,api_authentication/api/branches-54,200,OK,Thread Group 1-1,text,true,,715,616,1,1,http://localhost:5000/api/branches,5,0,0
+1794070247120,6,api_authentication/api/settings-55,200,OK,Thread Group 1-1,text,true,,519,655,1,1,http://localhost:5000/api/settings,6,0,0
+1794070247127,5,api_authentication/api/branches-56,200,OK,Thread Group 1-1,text,true,,715,655,1,1,http://localhost:5000/api/branches,5,0,0
+1794070247133,6,api_authentication/api/settings-57,200,OK,Thread Group 1-1,text,true,,519,655,1,1,http://localhost:5000/api/settings,6,0,0
