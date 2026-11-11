@@ -1,0 +1,111 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1794415796820,387,Login - extract access token,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,274,1,1,http://localhost:5000/api/auth/login,382,0,29
+1794415797240,164,Authenticated POS API Workload,200,"Number of samples in transaction : 6, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,44326,6063,1,1,null,0,8,0
+1794415797240,53,Dashboard and Branch Context,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,10083,1302,1,1,null,0,1,0
+1794415797241,16,/api/branches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,715,421,1,1,http://localhost:5000/api/branches,16,0,0
+1794415797257,8,/api/settings,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,421,1,1,http://localhost:5000/api/settings,8,0,0
+1794415797265,29,/api/dashboard/summary,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,8796,460,1,1,http://localhost:5000/api/dashboard/summary?from=2026-11-01&to=2026-11-08,28,0,0
+1794415797294,18,Product and Category Catalog,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3127,886,1,1,null,0,1,0
+1794415797294,10,/api/categories,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1243,444,1,1,http://localhost:5000/api/categories?includeInactive=true,10,0,0
+1794415797305,8,/api/products,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1884,442,1,1,http://localhost:5000/api/products?includeInactive=true,8,0,0
+1794415797313,35,Inventory,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,9353,852,1,1,null,0,1,0
+1794415797314,11,/api/inventory/batches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,6257,430,1,1,http://localhost:5000/api/inventory/batches,11,0,0
+1794415797325,24,/api/inventory,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,3096,422,1,1,http://localhost:5000/api/inventory,24,0,0
+1794415797349,26,Customer and Money Receipts,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,5448,1300,1,1,null,0,3,0
+1794415797350,8,/api/customers/lookup,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,727,447,1,1,http://localhost:5000/api/customers/lookup?phone=01560104656,8,0,0
+1794415797359,10,/api/customers,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2732,426,1,1,http://localhost:5000/api/customers?q=0,10,0,0
+1794415797370,8,/api/money-receipts,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1989,427,1,1,http://localhost:5000/api/money-receipts,8,0,0
+1794415797378,18,Invoices and Returns,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,12462,841,1,1,null,0,0,0
+1794415797378,11,/api/invoices,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,10120,421,1,1,http://localhost:5000/api/invoices,11,0,0
+1794415797389,7,/api/returns,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2342,420,1,1,http://localhost:5000/api/returns,7,0,0
+1794415797396,14,Expenses and Reports,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3853,882,1,1,null,0,2,0
+1794415797397,6,/api/expenses,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1270,421,1,1,http://localhost:5000/api/expenses,6,0,0
+1794415797404,8,/api/reports,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2583,461,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-08,7,0,0
+1794415797413,277,Login - extract access token,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,274,1,1,http://localhost:5000/api/auth/login,277,0,0
+1794415797691,152,Authenticated POS API Workload,200,"Number of samples in transaction : 6, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,44326,6063,1,1,null,0,9,0
+1794415797691,25,Dashboard and Branch Context,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,10083,1302,1,1,null,0,2,0
+1794415797691,6,/api/branches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,715,421,1,1,http://localhost:5000/api/branches,6,0,0
+1794415797698,7,/api/settings,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,421,1,1,http://localhost:5000/api/settings,7,0,0
+1794415797705,12,/api/dashboard/summary,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,8796,460,1,1,http://localhost:5000/api/dashboard/summary?from=2026-11-01&to=2026-11-08,12,0,0
+1794415797718,15,Product and Category Catalog,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3127,886,1,1,null,0,1,0
+1794415797718,6,/api/categories,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1243,444,1,1,http://localhost:5000/api/categories?includeInactive=true,6,0,0
+1794415797724,9,/api/products,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1884,442,1,1,http://localhost:5000/api/products?includeInactive=true,9,0,0
+1794415797734,28,Inventory,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,9353,852,1,1,null,0,0,0
+1794415797734,10,/api/inventory/batches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,6257,430,1,1,http://localhost:5000/api/inventory/batches,10,0,0
+1794415797744,18,/api/inventory,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,3096,422,1,1,http://localhost:5000/api/inventory,18,0,0
+1794415797762,31,Customer and Money Receipts,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,5448,1300,1,1,null,0,2,0
+1794415797762,10,/api/customers/lookup,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,727,447,1,1,http://localhost:5000/api/customers/lookup?phone=01560104656,10,0,0
+1794415797773,10,/api/customers,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2732,426,1,1,http://localhost:5000/api/customers?q=0,10,0,0
+1794415797784,11,/api/money-receipts,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1989,427,1,1,http://localhost:5000/api/money-receipts,11,0,0
+1794415797796,29,Invoices and Returns,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,12462,841,1,1,null,0,2,0
+1794415797796,22,/api/invoices,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,10120,421,1,1,http://localhost:5000/api/invoices,22,0,0
+1794415797819,7,/api/returns,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2342,420,1,1,http://localhost:5000/api/returns,7,0,0
+1794415797827,24,Expenses and Reports,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3853,882,1,1,null,0,1,0
+1794415797827,10,/api/expenses,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1270,421,1,1,http://localhost:5000/api/expenses,10,0,0
+1794415797838,14,/api/reports,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2583,461,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-08,14,0,0
+1794415797853,297,Login - extract access token,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,274,1,1,http://localhost:5000/api/auth/login,297,0,0
+1794415798150,149,Authenticated POS API Workload,200,"Number of samples in transaction : 6, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,44326,6063,1,1,null,0,7,0
+1794415798150,24,Dashboard and Branch Context,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,10083,1302,1,1,null,0,2,0
+1794415798150,6,/api/branches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,715,421,1,1,http://localhost:5000/api/branches,6,0,0
+1794415798157,6,/api/settings,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,421,1,1,http://localhost:5000/api/settings,6,0,0
+1794415798164,12,/api/dashboard/summary,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,8796,460,1,1,http://localhost:5000/api/dashboard/summary?from=2026-11-01&to=2026-11-08,12,0,0
+1794415798176,16,Product and Category Catalog,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3127,886,1,1,null,0,0,0
+1794415798176,8,/api/categories,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1243,444,1,1,http://localhost:5000/api/categories?includeInactive=true,8,0,0
+1794415798184,8,/api/products,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1884,442,1,1,http://localhost:5000/api/products?includeInactive=true,8,0,0
+1794415798192,39,Inventory,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,9353,852,1,1,null,0,0,0
+1794415798192,11,/api/inventory/batches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,6257,430,1,1,http://localhost:5000/api/inventory/batches,11,0,0
+1794415798203,28,/api/inventory,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,3096,422,1,1,http://localhost:5000/api/inventory,28,0,0
+1794415798231,28,Customer and Money Receipts,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,5448,1300,1,1,null,0,2,0
+1794415798232,9,/api/customers/lookup,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,727,447,1,1,http://localhost:5000/api/customers/lookup?phone=01560104656,9,0,0
+1794415798242,12,/api/customers,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2732,426,1,1,http://localhost:5000/api/customers?q=0,11,0,0
+1794415798254,7,/api/money-receipts,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1989,427,1,1,http://localhost:5000/api/money-receipts,7,0,0
+1794415798262,23,Invoices and Returns,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,12462,841,1,1,null,0,2,0
+1794415798262,12,/api/invoices,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,10120,421,1,1,http://localhost:5000/api/invoices,12,0,0
+1794415798275,11,/api/returns,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2342,420,1,1,http://localhost:5000/api/returns,11,0,0
+1794415798287,19,Expenses and Reports,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3853,882,1,1,null,0,0,0
+1794415798287,8,/api/expenses,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1270,421,1,1,http://localhost:5000/api/expenses,8,0,0
+1794415798295,11,/api/reports,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2583,461,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-08,11,0,0
+1794415798307,313,Login - extract access token,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,274,1,1,http://localhost:5000/api/auth/login,313,0,0
+1794415798621,127,Authenticated POS API Workload,200,"Number of samples in transaction : 6, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,44326,6063,1,1,null,0,6,0
+1794415798621,28,Dashboard and Branch Context,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,10083,1302,1,1,null,0,1,0
+1794415798621,6,/api/branches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,715,421,1,1,http://localhost:5000/api/branches,6,0,0
+1794415798627,8,/api/settings,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,421,1,1,http://localhost:5000/api/settings,8,0,0
+1794415798636,14,/api/dashboard/summary,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,8796,460,1,1,http://localhost:5000/api/dashboard/summary?from=2026-11-01&to=2026-11-08,14,0,0
+1794415798650,19,Product and Category Catalog,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3127,886,1,1,null,0,1,0
+1794415798650,9,/api/categories,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1243,444,1,1,http://localhost:5000/api/categories?includeInactive=true,9,0,0
+1794415798659,10,/api/products,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1884,442,1,1,http://localhost:5000/api/products?includeInactive=true,10,0,0
+1794415798670,26,Inventory,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,9353,852,1,1,null,0,0,0
+1794415798670,10,/api/inventory/batches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,6257,430,1,1,http://localhost:5000/api/inventory/batches,10,0,0
+1794415798680,16,/api/inventory,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,3096,422,1,1,http://localhost:5000/api/inventory,16,0,0
+1794415798696,21,Customer and Money Receipts,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,5448,1300,1,1,null,0,3,0
+1794415798697,8,/api/customers/lookup,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,727,447,1,1,http://localhost:5000/api/customers/lookup?phone=01560104656,8,0,0
+1794415798706,6,/api/customers,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2732,426,1,1,http://localhost:5000/api/customers?q=0,6,0,0
+1794415798712,7,/api/money-receipts,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1989,427,1,1,http://localhost:5000/api/money-receipts,7,0,0
+1794415798720,16,Invoices and Returns,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,12462,841,1,1,null,0,1,0
+1794415798720,8,/api/invoices,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,10120,421,1,1,http://localhost:5000/api/invoices,8,0,0
+1794415798729,8,/api/returns,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2342,420,1,1,http://localhost:5000/api/returns,8,0,0
+1794415798737,17,Expenses and Reports,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3853,882,1,1,null,0,0,0
+1794415798737,7,/api/expenses,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1270,421,1,1,http://localhost:5000/api/expenses,7,0,0
+1794415798744,10,/api/reports,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2583,461,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-08,10,0,0
+1794415798755,291,Login - extract access token,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,274,1,1,http://localhost:5000/api/auth/login,291,0,0
+1794415799047,249,Authenticated POS API Workload,200,"Number of samples in transaction : 6, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,44326,6063,1,1,null,0,7,0
+1794415799047,91,Dashboard and Branch Context,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,10083,1302,1,1,null,0,1,0
+1794415799047,19,/api/branches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,715,421,1,1,http://localhost:5000/api/branches,19,0,0
+1794415799066,33,/api/settings,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,572,421,1,1,http://localhost:5000/api/settings,33,0,0
+1794415799100,39,/api/dashboard/summary,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,8796,460,1,1,http://localhost:5000/api/dashboard/summary?from=2026-11-01&to=2026-11-08,39,0,0
+1794415799139,22,Product and Category Catalog,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3127,886,1,1,null,0,2,0
+1794415799139,10,/api/categories,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1243,444,1,1,http://localhost:5000/api/categories?includeInactive=true,10,0,0
+1794415799150,12,/api/products,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1884,442,1,1,http://localhost:5000/api/products?includeInactive=true,12,0,0
+1794415799163,58,Inventory,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,9353,852,1,1,null,0,1,0
+1794415799163,19,/api/inventory/batches,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,6257,430,1,1,http://localhost:5000/api/inventory/batches,19,0,0
+1794415799183,39,/api/inventory,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,3096,422,1,1,http://localhost:5000/api/inventory,39,0,0
+1794415799222,27,Customer and Money Receipts,200,"Number of samples in transaction : 3, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,5448,1300,1,1,null,0,1,0
+1794415799222,7,/api/customers/lookup,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,727,447,1,1,http://localhost:5000/api/customers/lookup?phone=01560104656,7,0,0
+1794415799230,12,/api/customers,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2732,426,1,1,http://localhost:5000/api/customers?q=0,12,0,0
+1794415799242,8,/api/money-receipts,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1989,427,1,1,http://localhost:5000/api/money-receipts,8,0,0
+1794415799250,27,Invoices and Returns,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,12462,841,1,1,null,0,2,0
+1794415799251,14,/api/invoices,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,10120,421,1,1,http://localhost:5000/api/invoices,14,0,0
+1794415799266,13,/api/returns,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2342,420,1,1,http://localhost:5000/api/returns,13,0,0
+1794415799279,24,Expenses and Reports,200,"Number of samples in transaction : 2, number of failing samples : 0",Load Test - 10 Concurrent Users 1-1,,true,,3853,882,1,1,null,0,0,0
+1794415799279,13,/api/expenses,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,1270,421,1,1,http://localhost:5000/api/expenses,12,0,0
+1794415799292,11,/api/reports,200,OK,Load Test - 10 Concurrent Users 1-1,text,true,,2583,461,1,1,http://localhost:5000/api/reports?type=sales&from=2026-11-01&to=2026-11-08,10,0,0

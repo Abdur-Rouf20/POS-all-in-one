@@ -1,0 +1,6 @@
+# Local-only JMeter properties. Copy this file to POS_JMeter.local.properties.
+# Replace the placeholders locally. Never commit the real properties file.
+owner_email=CHANGE_ME
+owner_password=CHANGE_ME
+branch_id=CHANGE_ME
+lookup_phone=CHANGE_ME
