@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS Unified QA Report</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 28px;
+      font-family: Arial, sans-serif;
+      color: #202938;
+      background: #f4f6f9;
+    }
+
+    header, main, footer {
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 { margin-bottom: 8px; }
+
+    .meta, footer {
+      color: #657184;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .card {
+      padding: 18px;
+      background: white;
+      border: 1px solid #dfe4eb;
+      border-radius: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    h2 { font-size: 18px; }
+
+    .status {
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .pass { background: #e2f5e9; color: #176b36; }
+    .fail { background: #fde7e7; color: #a32222; }
+    .missing { background: #fff1d6; color: #875600; }
+
+    .path {
+      color: #758092;
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 8px 4px;
+      text-align: left;
+      border-top: 1px solid #edf0f4;
+    }
+
+    th {
+      width: 48%;
+      font-weight: normal;
+      color: #657184;
+    }
+
+    td { font-weight: 600; }
+
+    footer { margin-top: 24px; }
+
+    @media (max-width: 600px) {
+      body { padding: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>POS Unified QA Report</h1>
+
+    <div class="meta">
+      Generated: 2026-11-14T07:33:22.952Z<br>
+      Snapshot ID: 2026-11-14_133322<br>
+      This report represents the latest source results available at generation time.
+    </div>
+  </header>
+
+  <main>
+      <section class="card">
+        <div class="card-header">
+          <h2>Playwright UI Tests</h2>
+          <span class="status pass">
+            PASS
+          </span>
+        </div>
+
+        <p class="path">tests/ui/test-results/junit.xml</p>
+
+        <table>
+          
+        <tr>
+          <th>Total tests</th>
+          <td>8</td>
+        </tr>
+      
+        <tr>
+          <th>Passed</th>
+          <td>8</td>
+        </tr>
+      
+        <tr>
+          <th>Failed</th>
+          <td>0</td>
+        </tr>
+      
+        <tr>
+          <th>Skipped</th>
+          <td>0</td>
+        </tr>
+      
+        </table>
+      </section>
+    
+      <section class="card">
+        <div class="card-header">
+          <h2>Newman API Tests</h2>
+          <span class="status pass">
+            PASS
+          </span>
+        </div>
+
+        <p class="path">tests/api/reports/newman-junit.xml</p>
+
+        <table>
+          
+        <tr>
+          <th>Total tests</th>
+          <td>14</td>
+        </tr>
+      
+        <tr>
+          <th>Passed</th>
+          <td>14</td>
+        </tr>
+      
+        <tr>
+          <th>Failed</th>
+          <td>0</td>
+        </tr>
+      
+        <tr>
+          <th>Skipped</th>
+          <td>0</td>
+        </tr>
+      
+        </table>
+      </section>
+    
+      <section class="card">
+        <div class="card-header">
+          <h2>JMeter Load Test</h2>
+          <span class="status pass">
+            PASS
+          </span>
+        </div>
+
+        <p class="path">tests/performance/reports/results/load-test.jtl</p>
+
+        <table>
+          
+        <tr>
+          <th>HTTP samples</th>
+          <td>75</td>
+        </tr>
+      
+        <tr>
+          <th>Passed</th>
+          <td>75</td>
+        </tr>
+      
+        <tr>
+          <th>Failed</th>
+          <td>0</td>
+        </tr>
+      
+        <tr>
+          <th>Error rate</th>
+          <td>0%</td>
+        </tr>
+      
+        <tr>
+          <th>Average response time</th>
+          <td>32.08 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Median</th>
+          <td>10 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P90</th>
+          <td>33 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P95</th>
+          <td>291 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P99</th>
+          <td>387 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Minimum</th>
+          <td>6 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Maximum</th>
+          <td>387 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Throughput</th>
+          <td>26.23 samples/sec</td>
+        </tr>
+      
+        </table>
+      </section>
+    
+      <section class="card">
+        <div class="card-header">
+          <h2>JMeter Stress Test</h2>
+          <span class="status pass">
+            PASS
+          </span>
+        </div>
+
+        <p class="path">tests/performance/reports/results/stress-test.jtl</p>
+
+        <table>
+          
+        <tr>
+          <th>HTTP samples</th>
+          <td>2400</td>
+        </tr>
+      
+        <tr>
+          <th>Passed</th>
+          <td>2400</td>
+        </tr>
+      
+        <tr>
+          <th>Failed</th>
+          <td>0</td>
+        </tr>
+      
+        <tr>
+          <th>Error rate</th>
+          <td>0%</td>
+        </tr>
+      
+        <tr>
+          <th>Average response time</th>
+          <td>25.97 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Median</th>
+          <td>6 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P90</th>
+          <td>13 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P95</th>
+          <td>274 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P99</th>
+          <td>284 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Minimum</th>
+          <td>3 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Maximum</th>
+          <td>2367 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Throughput</th>
+          <td>11.64 samples/sec</td>
+        </tr>
+      
+        </table>
+      </section>
+    
+      <section class="card">
+        <div class="card-header">
+          <h2>JMeter Spike Test</h2>
+          <span class="status pass">
+            PASS
+          </span>
+        </div>
+
+        <p class="path">tests/performance/reports/results/spike-test.jtl</p>
+
+        <table>
+          
+        <tr>
+          <th>HTTP samples</th>
+          <td>13344</td>
+        </tr>
+      
+        <tr>
+          <th>Passed</th>
+          <td>13344</td>
+        </tr>
+      
+        <tr>
+          <th>Failed</th>
+          <td>0</td>
+        </tr>
+      
+        <tr>
+          <th>Error rate</th>
+          <td>0%</td>
+        </tr>
+      
+        <tr>
+          <th>Average response time</th>
+          <td>304.81 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Median</th>
+          <td>31 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P90</th>
+          <td>933 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P95</th>
+          <td>1253 ms</td>
+        </tr>
+      
+        <tr>
+          <th>P99</th>
+          <td>2772 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Minimum</th>
+          <td>3 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Maximum</th>
+          <td>9990 ms</td>
+        </tr>
+      
+        <tr>
+          <th>Throughput</th>
+          <td>42.84 samples/sec</td>
+        </tr>
+      
+        </table>
+      </section>
+    </main>
+
+  <footer>
+    Generated by POS Phase 12 Unified QA Reporting.
+  </footer>
+</body>
+</html>

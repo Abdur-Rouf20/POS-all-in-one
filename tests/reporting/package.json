@@ -1,0 +1,14 @@
+{
+  "name": "pos-unified-qa-reporting",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Unified QA reporting for POS UI, API and performance tests",
+  "scripts": {
+    "report": "node scripts/generate-report.js --archive",
+    "report:latest": "node scripts/generate-report.js"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.3.0"
+  }
+}
