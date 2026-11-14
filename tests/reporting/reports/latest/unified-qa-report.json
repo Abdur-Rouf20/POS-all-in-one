@@ -1,0 +1,126 @@
+{
+  "title": "POS Unified QA Report",
+  "generatedAt": "2026-11-14T07:39:31.110Z",
+  "snapshotId": "2026-11-14_133931",
+  "sources": [
+    {
+      "key": "ui",
+      "name": "Playwright UI Tests",
+      "type": "junit",
+      "file": "tests/ui/test-results/junit.xml",
+      "archiveName": "playwright-junit.xml",
+      "available": true,
+      "metrics": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "status": "PASS"
+      },
+      "status": "PASS",
+      "error": null,
+      "sizeBytes": 1685,
+      "lastModified": "2026-11-04T17:05:47.355Z"
+    },
+    {
+      "key": "api",
+      "name": "Newman API Tests",
+      "type": "junit",
+      "file": "tests/api/reports/newman-junit.xml",
+      "archiveName": "newman-junit.xml",
+      "available": true,
+      "metrics": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "status": "PASS"
+      },
+      "status": "PASS",
+      "error": null,
+      "sizeBytes": 3172,
+      "lastModified": "2026-11-12T14:45:02.049Z"
+    },
+    {
+      "key": "load",
+      "name": "JMeter Load Test",
+      "type": "jtl",
+      "file": "tests/performance/reports/results/load-test.jtl",
+      "archiveName": "load-test.jtl",
+      "available": true,
+      "metrics": {
+        "total": 75,
+        "passed": 75,
+        "failed": 0,
+        "errorRate": 0,
+        "averageMs": 32.08,
+        "medianMs": 10,
+        "p90Ms": 33,
+        "p95Ms": 291,
+        "p99Ms": 387,
+        "minMs": 6,
+        "maxMs": 387,
+        "throughputPerSecond": 26.23,
+        "status": "PASS"
+      },
+      "status": "PASS",
+      "error": null,
+      "sizeBytes": 18220,
+      "lastModified": "2026-11-12T14:45:02.234Z"
+    },
+    {
+      "key": "stress",
+      "name": "JMeter Stress Test",
+      "type": "jtl",
+      "file": "tests/performance/reports/results/stress-test.jtl",
+      "archiveName": "stress-test.jtl",
+      "available": true,
+      "metrics": {
+        "total": 2400,
+        "passed": 2400,
+        "failed": 0,
+        "errorRate": 0,
+        "averageMs": 25.97,
+        "medianMs": 6,
+        "p90Ms": 13,
+        "p95Ms": 274,
+        "p99Ms": 284,
+        "minMs": 3,
+        "maxMs": 2367,
+        "throughputPerSecond": 11.64,
+        "status": "PASS"
+      },
+      "status": "PASS",
+      "error": null,
+      "sizeBytes": 557934,
+      "lastModified": "2026-11-12T14:45:02.251Z"
+    },
+    {
+      "key": "spike",
+      "name": "JMeter Spike Test",
+      "type": "jtl",
+      "file": "tests/performance/reports/results/spike-test.jtl",
+      "archiveName": "spike-test.jtl",
+      "available": true,
+      "metrics": {
+        "total": 13344,
+        "passed": 13344,
+        "failed": 0,
+        "errorRate": 0,
+        "averageMs": 304.81,
+        "medianMs": 31,
+        "p90Ms": 933,
+        "p95Ms": 1253,
+        "p99Ms": 2772,
+        "minMs": 3,
+        "maxMs": 9990,
+        "throughputPerSecond": 42.84,
+        "status": "PASS"
+      },
+      "status": "PASS",
+      "error": null,
+      "sizeBytes": 2983837,
+      "lastModified": "2026-11-12T14:45:02.248Z"
+    }
+  ]
+}

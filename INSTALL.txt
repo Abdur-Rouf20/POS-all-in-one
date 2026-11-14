@@ -1,0 +1,16 @@
+PHASE 12 PATCH — Unified QA Reporting
+
+Copy the `tests/reporting` folder from this ZIP into your repository root:
+D:\New folder\POS-all-in-one
+
+Then run from PowerShell:
+cd "D:\New folder\POS-all-in-one\tests\reporting"
+npm install
+npm run report
+
+Expected outputs:
+tests/reporting/reports/unified-qa-report.html
+tests/reporting/reports/unified-qa-report.json
+
+This patch does not modify existing UI/API/performance test plans or their package files.
+Before committing, review generated reports for sensitive data and ensure all source files are present.

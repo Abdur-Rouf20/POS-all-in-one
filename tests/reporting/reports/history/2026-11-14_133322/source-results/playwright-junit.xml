@@ -1,0 +1,26 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="10.464504000000002">
+<testsuite name="auth.spec.js" timestamp="2026-11-04T17:05:37.000Z" hostname="chromium" tests="3" failures="0" skipped="0" time="17.903" errors="0">
+<testcase name="owner can sign in with valid credentials" classname="auth.spec.js" time="7.011">
+</testcase>
+<testcase name="invalid credentials show an authentication error" classname="auth.spec.js" time="4.065">
+</testcase>
+<testcase name="owner can sign out" classname="auth.spec.js" time="6.827">
+</testcase>
+</testsuite>
+<testsuite name="health.spec.js" timestamp="2026-11-04T17:05:37.000Z" hostname="chromium" tests="2" failures="0" skipped="0" time="4.159" errors="0">
+<testcase name="API health endpoint responds successfully" classname="health.spec.js" time="0.229">
+</testcase>
+<testcase name="POS frontend is reachable" classname="health.spec.js" time="3.93">
+</testcase>
+</testsuite>
+<testsuite name="owner-navigation.spec.js" timestamp="2026-11-04T17:05:37.000Z" hostname="chromium" tests="2" failures="0" skipped="0" time="15.154" errors="0">
+<testcase name="owner sees owner-only navigation items" classname="owner-navigation.spec.js" time="7.33">
+</testcase>
+<testcase name="owner can open core read-only pages" classname="owner-navigation.spec.js" time="7.824">
+</testcase>
+</testsuite>
+<testsuite name="salesman-access.spec.js" timestamp="2026-11-04T17:05:37.000Z" hostname="chromium" tests="1" failures="0" skipped="0" time="3.042" errors="0">
+<testcase name="salesman sees assigned branch and does not see owner-only navigation" classname="salesman-access.spec.js" time="3.042">
+</testcase>
+</testsuite>
+</testsuites>
