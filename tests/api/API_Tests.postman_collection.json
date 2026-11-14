@@ -66,7 +66,7 @@
                   "  pm.expect(body.user).to.have.property('role');",
                   "  pm.expect(body.user).to.not.have.property('passwordHash');",
                   "});",
-                  "if (body.token) pm.collectionVariables.set('access_token', body.token);",
+                  "if (body.token) pm.environment.set('access_token', body.token);",
                   "if (body.user && body.user.role) pm.collectionVariables.set('logged_in_role', body.user.role);"
                 ]
               }
