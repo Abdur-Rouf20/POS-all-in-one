@@ -1,0 +1,161 @@
+
+{
+  "id": null,
+  "uid": "pos-overview",
+  "title": "POS Application Monitoring",
+  "description": "Application performance and infrastructure monitoring for POS MVP",
+  "tags": ["POS", "Prometheus", "Monitoring"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "HTTP Request Rate by Route",
+      "description": "Requests per second grouped by endpoint",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (route) (rate(pos_http_requests_total[5m]))",
+          "legendFormat": "{{route}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "reqps"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "API Response Time - P95",
+      "description": "95th percentile API response time in milliseconds",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(pos_http_request_duration_seconds_bucket[5m]))) * 1000",
+          "legendFormat": "P95 latency"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "ms"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "HTTP 5xx Error Rate",
+      "description": "Percentage of server-error responses",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 * (sum(rate(pos_http_requests_total{status_code=~\"5..\"}[5m])) or vector(0)) / clamp_min(sum(rate(pos_http_requests_total[5m])), 0.001)",
+          "legendFormat": "5xx error rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "percent"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Average API Response Time",
+      "description": "Average HTTP request duration in milliseconds",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * (sum(rate(pos_http_request_duration_seconds_sum[5m])) or vector(0)) / clamp_min((sum(rate(pos_http_request_duration_seconds_count[5m])) or vector(0)), 0.001)",
+          "legendFormat": "Average latency"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "ms"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Requests Currently Processing",
+      "description": "Number of HTTP requests currently in progress",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "pos_http_requests_in_progress",
+          "legendFormat": "In progress"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "short"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Backend Process Memory",
+      "description": "Node.js backend resident memory usage in MiB",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_resident_memory_bytes / 1024 / 1024",
+          "legendFormat": "Backend memory"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "short"},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "graphTooltip": 1
+}
