@@ -9,3 +9,4 @@ tests/ui/.env
 tests/ui/playwright-report/
 tests/ui/test-results/
 tests/api/*.private.postman_environment.json
+tests/performance/data/owner-users.csv

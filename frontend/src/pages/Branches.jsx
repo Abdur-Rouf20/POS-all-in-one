@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Pencil } from 'lucide-react';
 import { api } from '../services/api.js';
 
 const emptyForm = {
@@ -9,7 +10,7 @@ const emptyForm = {
   active: true
 };
 
-export default function Branches() {
+export default function Branches({ t }) {
   const [branches, setBranches] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
@@ -71,10 +72,10 @@ export default function Branches() {
 
       if (editingId) {
         await api.updateBranch(editingId, form);
-        setMessage('Branch updated successfully.');
+        setMessage(t.branchUpdated);
       } else {
         await api.createBranch(form);
-        setMessage('Branch created successfully.');
+        setMessage(t.branchCreated);
       }
 
       resetForm();
@@ -87,89 +88,99 @@ export default function Branches() {
   }
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <>
+      <div className="page-heading">
         <div>
-          <h1>Branch Management</h1>
-          <p>Create and manage your shop branches.</p>
+          <div className="eyebrow">{t.branch}</div>
+          <h1>{t.branchManagement}</h1>
+          <p className="muted">{t.manageBranches}</p>
         </div>
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
-      {message && <div className="success-banner">{message}</div>}
+      {error && <div className="alert error" role="alert">{error}</div>}
+      {message && <div className="alert success" role="status">{message}</div>}
 
-      <section className="panel">
-        <h2>{editingId ? 'Edit Branch' : 'Add New Branch'}</h2>
+      <section className="panel form-panel">
+        <div className="panel-title">
+          <div>
+            <h2>{editingId ? t.editBranch : t.addBranch}</h2>
+            <p className="muted">{t.manageBranches}</p>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
-            <label>
-              Branch Name *
+            <div className="field">
+              <label htmlFor="branch-name">{t.branchName} *</label>
               <input
+                id="branch-name"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder="e.g. Dhanmondi Branch"
+                placeholder="যেমন: ধানমন্ডি শাখা"
                 required
               />
-            </label>
+            </div>
 
-            <label>
-              Branch Code *
+            <div className="field">
+              <label htmlFor="branch-code">{t.branchCode} *</label>
               <input
+                id="branch-code"
                 name="code"
                 value={form.code}
                 onChange={handleChange}
-                placeholder="e.g. DHA-01"
+                placeholder="যেমন: DHA-01"
                 required
               />
-            </label>
+            </div>
 
-            <label>
-              Phone
+            <div className="field">
+              <label htmlFor="branch-phone">{t.phone}</label>
               <input
+                id="branch-phone"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="Branch phone number"
+                placeholder={t.branchPhone}
               />
-            </label>
+            </div>
 
-            <label>
-              Address
+            <div className="field">
+              <label htmlFor="branch-address">{t.address}</label>
               <input
+                id="branch-address"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                placeholder="Branch address"
+                placeholder={t.branchAddress}
               />
-            </label>
+            </div>
           </div>
 
           {editingId && (
-            <label className="checkbox-label">
+            <label className="branch-active-toggle">
               <input
                 type="checkbox"
                 name="active"
                 checked={form.active}
                 onChange={handleChange}
               />
-              Active branch
+              {t.activeBranch}
             </label>
           )}
 
-          <div className="form-actions">
-            <button type="submit" disabled={saving}>
+          <div className="branch-form-actions">
+            <button type="submit" className="button primary" disabled={saving}>
               {saving
-                ? 'Saving...'
+                ? t.savingDots
                 : editingId
-                  ? 'Update Branch'
-                  : 'Create Branch'}
+                  ? t.updateBranch
+                  : t.createBranch}
             </button>
 
             {editingId && (
-              <button type="button" className="secondary-button" onClick={resetForm}>
-                Cancel
+              <button type="button" className="button secondary" onClick={resetForm}>
+                {t.cancel}
               </button>
             )}
           </div>
@@ -177,23 +188,25 @@ export default function Branches() {
       </section>
 
       <section className="panel">
-        <h2>All Branches ({branches.length})</h2>
+        <div className="branch-list-heading">
+          <h2>{t.allBranches.replace('{count}', String(branches.length))}</h2>
+        </div>
 
         {loading ? (
-          <p>Loading branches...</p>
+          <p>{t.loadingBranches}</p>
         ) : branches.length === 0 ? (
-          <p>No branches found.</p>
+          <p>{t.noBranches}</p>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Branch</th>
-                  <th>Code</th>
-                  <th>Phone</th>
-                  <th>Address</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>{t.branch}</th>
+                  <th>{t.branchCode}</th>
+                  <th>{t.phone}</th>
+                  <th>{t.address}</th>
+                  <th>{t.categoryStatus}</th>
+                  <th className="right">{t.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,10 +216,16 @@ export default function Branches() {
                     <td>{branch.code}</td>
                     <td>{branch.phone || '—'}</td>
                     <td>{branch.address || '—'}</td>
-                    <td>{branch.active === false ? 'Inactive' : 'Active'}</td>
-                    <td>
-                      <button type="button" onClick={() => startEdit(branch)}>
-                        Edit
+                    <td>{branch.active === false ? t.inactive : t.active}</td>
+                    <td className="right">
+                      <button
+                        type="button"
+                        className="icon-button"
+                        title={t.edit}
+                        aria-label={`${t.edit}: ${branch.name}`}
+                        onClick={() => startEdit(branch)}
+                      >
+                        <Pencil size={16}/>
                       </button>
                     </td>
                   </tr>
@@ -216,6 +235,6 @@ export default function Branches() {
           </div>
         )}
       </section>
-    </div>
+    </>
   );
 }

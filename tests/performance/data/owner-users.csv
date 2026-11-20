@@ -3,7 +3,7 @@ owner@example.com,ChangeThisPassword123!
 
 
 
-$jmeter = "D:\apache-jmeter-5.6.3\bin"
+$jmeter = "D:\apache-jmeter-5.6.3\bin\jmeter.bat"
 
 $plan = ".\tests\performance\test-plans\POS_Authenticated_API_Recording.jmx"
 
@@ -22,3 +22,24 @@ if (Test-Path $jtl) {
 
 # Check execution status
 $LASTEXITCODE
+
+
+
+cd "D:\New folder\POS-all-in-one"
+
+$plan = ".\tests\performance\test-plans\POS_Load_Test.jmx"
+
+[xml]$jmx = Get-Content $plan
+
+$jmx.SelectNodes("//HTTPSamplerProxy") | ForEach-Object {
+    $name = $_.GetAttribute("testname")
+    $domain = $_.hashTree.elementProp |
+        Where-Object { $_.GetAttribute("name") -eq "HTTPsampler.Arguments" }
+    $port = $_.hashTree.stringProp |
+        Where-Object { $_.GetAttribute("name") -eq "HTTPSampler.port" }
+
+    [PSCustomObject]@{
+        Request = $name
+        Port = $port.'#text'
+    }
+} | Format-Table -AutoSize
