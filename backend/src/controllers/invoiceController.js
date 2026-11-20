@@ -9,6 +9,7 @@ import Payment from '../models/Payment.js';
 import InvoiceRevision from '../models/InvoiceRevision.js';
 import { actorOf, audit } from '../utils/audit.js';
 import { normalizePhone } from '../utils/phone.js';
+import { calculateInvoicePricing, normalizeInitialPayment } from '../utils/invoicePricing.js';
 
 function round(n) { return Math.round((Number(n) + Number.EPSILON) * 100) / 100; }
 function makeInvoiceNo() { return `INV-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`; }
@@ -97,21 +98,23 @@ async function normalize(body, branchId, user, old = null, stockCredit = new Map
     items.push({ product: product._id, name: product.name, sku: product.sku || '', quantity, unitPrice, lineTotal: round(quantity * unitPrice), batchAllocations });
   }
   const subtotal = round(items.reduce((sum, item) => sum + item.lineTotal, 0));
-  const discount = round(Math.max(0, Number(body.discount) || 0));
-  if (discount > subtotal) throw Object.assign(new Error('Discount cannot exceed subtotal.'), { status: 400 });
-  const taxRate = Math.max(0, Number(body.taxRate) || 0);
-  const taxAmount = round((subtotal - discount) * taxRate / 100);
-  const total = round(subtotal - discount + taxAmount);
-  const paidAmount = old ? old.paidAmount : round(Math.max(0, Number(body.paidAmount ?? total)));
+  const pricing = calculateInvoicePricing({
+    subtotal,
+    discountType: body.discountType ?? old?.discountType ?? 'fixed',
+    discountValue: body.discountValue ?? body.discount ?? old?.discountValue ?? old?.discount ?? 0,
+    taxRate: body.taxRate ?? old?.taxRate ?? 0
+  });
+  const { discountType, discountValue, discount, taxRate, taxAmount, total } = pricing;
+  const initialPayment = old ? null : normalizeInitialPayment(body);
+  const paidAmount = old ? old.paidAmount : initialPayment.paidAmount;
   if (paidAmount > total) throw Object.assign(new Error('Initial payment cannot exceed invoice total.'), { status: 400 });
-  const cashAmount = old ? old.cashAmount : round(Math.max(0, Number(body.cashAmount) || 0));
-  const banglaQrAmount = old ? old.banglaQrAmount : round(Math.max(0, Number(body.banglaQrAmount) || 0));
-  if (round(cashAmount + banglaQrAmount) !== paidAmount) throw Object.assign(new Error('Cash plus Bangla QR must exactly equal the initial payment amount.'), { status: 400 });
+  const cashAmount = old ? old.cashAmount : initialPayment.cashAmount;
+  const banglaQrAmount = old ? old.banglaQrAmount : initialPayment.banglaQrAmount;
   const paymentType = paidAmount === 0 ? 'unpaid' : cashAmount > 0 && banglaQrAmount > 0 ? 'mixed' : cashAmount > 0 ? 'cash' : 'bangla_qr';
   return {
     branchId, createdBy: old?.createdBy || actorOf(user), customerId: customer._id,
     customerName: customer.name, customerPhone: customer.phone, customerAddress: customer.address,
-    items, subtotal, discount, taxRate, taxAmount, total, paidAmount,
+    items, subtotal, discountType, discountValue, discount, taxRate, taxAmount, total, paidAmount,
     cashAmount, banglaQrAmount, paymentType,
     dueAmount: round(total - paidAmount),
     paymentStatus: paidAmount >= total ? 'paid' : paidAmount > 0 ? 'partial' : 'unpaid',
@@ -212,6 +215,7 @@ function revisionSnapshot(invoice) {
       }))
     })),
     subtotal: value.subtotal, discount: value.discount, taxRate: value.taxRate,
+    discountType: value.discountType, discountValue: value.discountValue,
     taxAmount: value.taxAmount, total: value.total, notes: value.notes,
     invoiceDate: value.invoiceDate
   };

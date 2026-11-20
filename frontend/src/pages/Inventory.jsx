@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api.js';
 
-const money = value => `৳${Number(value || 0).toFixed(2)}`;
-
-export default function Inventory() {
+export default function Inventory({ t, settings, lang }) {
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('pos-user') || 'null'); }
     catch { return null; }
@@ -22,6 +20,8 @@ export default function Inventory() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const locale = lang === 'bn' ? 'bn-BD' : 'en-US';
+  const money = value => `${settings?.currency || '৳'} ${Number(value || 0).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   async function load() {
     const [inventory, productList, batchList] = await Promise.all([api.inventory(), api.products(), api.batches()]);
@@ -48,7 +48,9 @@ export default function Inventory() {
       const body = { productId, quantity: Number(quantity), sellingPrice: Number(sellingPrice), receivedAt, note };
       if (isOwner) body.purchasePrice = Number(purchasePrice);
       const result = await api.receiveStock(body);
-      setMessage(`Stock received successfully. Batch: ${result.batch.batchNo}${result.batch.costStatus === 'pending_owner' ? ' — buying cost needs Owner review.' : ''}`);
+      setMessage(t.stockReceived
+        .replace('{batch}', result.batch.batchNo)
+        .replace('{review}', result.batch.costStatus === 'pending_owner' ? t.needsOwnerReview : ''));
       setQuantity('1'); setNote(''); setPurchasePrice('');
       await load();
     } catch (e) { setError(e.message); }
@@ -59,7 +61,7 @@ export default function Inventory() {
     setError(''); setMessage('');
     try {
       await api.updateBatchCost(batchId, Number(costDrafts[batchId]));
-      setMessage('Batch buying cost updated.');
+      setMessage(t.batchCostUpdated);
       await load();
     } catch (e) { setError(e.message); }
   }
@@ -68,47 +70,47 @@ export default function Inventory() {
 
   return <>
     <div className="page-heading">
-      <div><h1>Branch inventory</h1><p className="muted">Receive stock into product batches and review batch-level availability.</p></div>
+      <div><h1>{t.branchInventory}</h1><p className="muted">{t.inventoryHint}</p></div>
     </div>
     {error && <div className="alert error">{error}</div>}
     {message && <div className="alert success">{message}</div>}
     <div className="stats-grid">
-      <div className="stat-card"><span className="muted">Products in this branch</span><strong>{rows.length}</strong></div>
-      <div className="stat-card"><span className="muted">Total available units</span><strong>{totalUnits.toLocaleString()}</strong></div>
-      <div className="stat-card"><span className="muted">Active batches</span><strong>{batches.filter(batch => batch.quantity > 0).length}</strong></div>
+      <div className="stat-card"><span className="muted">{t.productsInBranch}</span><strong>{rows.length}</strong></div>
+      <div className="stat-card"><span className="muted">{t.totalAvailableUnits}</span><strong>{totalUnits.toLocaleString(locale)}</strong></div>
+      <div className="stat-card"><span className="muted">{t.activeBatches}</span><strong>{batches.filter(batch => batch.quantity > 0).length}</strong></div>
     </div>
     <section className="panel form-panel">
-      <div className="panel-title"><div><h2>Receive stock</h2><p className="muted">Every receipt creates a new branch-specific batch with an automatic batch number.</p></div></div>
+      <div className="panel-title"><div><h2>{t.receiveStock}</h2><p className="muted">{t.receiveStockHint}</p></div></div>
       <form onSubmit={receive} className="form-grid three">
-        <div className="field"><label>Existing product *</label><select required value={productId} onChange={e => changeProduct(e.target.value)}><option value="">Select product</option>{products.map(product => <option key={product._id} value={product._id}>{product.name}{product.sku ? ` · ${product.sku}` : ''}</option>)}</select></div>
-        <div className="field"><label>Quantity received *</label><input type="number" min="0.0001" step="0.0001" required value={quantity} onChange={e => setQuantity(e.target.value)}/></div>
-        <div className="field"><label>Batch selling price *</label><input type="number" min="0" step="0.01" required value={sellingPrice} onChange={e => setSellingPrice(e.target.value)}/></div>
-        {isOwner && <div className="field"><label>Buying unit price *</label><input type="number" min="0" step="0.01" required value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} placeholder="Owner only"/></div>}
-        <div className="field"><label>Received date *</label><input type="date" required value={receivedAt} onChange={e => setReceivedAt(e.target.value)}/></div>
-        <div className="field"><label>Note / supplier reference</label><input value={note} onChange={e => setNote(e.target.value)} placeholder="Optional"/></div>
-        <div><button className="button primary" disabled={busy || !products.length}>{busy ? 'Saving…' : 'Record stock receipt'}</button></div>
+        <div className="field"><label>{t.existingProduct} *</label><select required value={productId} onChange={e => changeProduct(e.target.value)}><option value="">{t.chooseProduct}</option>{products.map(product => <option key={product._id} value={product._id}>{product.name}{product.sku ? ` · ${product.sku}` : ''}</option>)}</select></div>
+        <div className="field"><label>{t.quantityReceived} *</label><input type="number" min="0.0001" step="0.0001" required value={quantity} onChange={e => setQuantity(e.target.value)}/></div>
+        <div className="field"><label>{t.batchSellingPrice} *</label><input type="number" min="0" step="0.01" required value={sellingPrice} onChange={e => setSellingPrice(e.target.value)}/></div>
+        {isOwner && <div className="field"><label>{t.buyingUnitPrice} *</label><input type="number" min="0" step="0.01" required value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} placeholder={t.ownerOnly}/></div>}
+        <div className="field"><label>{t.receivedDate} *</label><input type="date" required value={receivedAt} onChange={e => setReceivedAt(e.target.value)}/></div>
+        <div className="field"><label>{t.noteSupplier}</label><input value={note} onChange={e => setNote(e.target.value)} placeholder={t.optional}/></div>
+        <div><button className="button primary" disabled={busy || !products.length}>{busy ? t.saving : t.recordStockReceipt}</button></div>
       </form>
-      {!isOwner && <p className="field-help">Buying cost is hidden. This batch will be marked for Owner cost review before profit reporting.</p>}
+      {!isOwner && <p className="field-help">{t.buyingCostHidden}</p>}
     </section>
     <section className="panel table-panel">
-      <div className="panel-title"><div><h2>Current branch stock</h2><p className="muted">Stock totals are summarized by product and expanded by batch.</p></div></div>
-      <div className="table-scroll"><table><thead><tr><th>Product</th><th>SKU</th><th>Category</th><th className="right">Available</th><th>Batch breakdown</th></tr></thead><tbody>
+      <div className="panel-title"><div><h2>{t.currentBranchStock}</h2><p className="muted">{t.stockSummaryHint}</p></div></div>
+      <div className="table-scroll"><table><thead><tr><th>{t.product}</th><th>{t.sku}</th><th>{t.category}</th><th className="right">{t.availableLabel}</th><th>{t.batchBreakdown}</th></tr></thead><tbody>
         {rows.map(row => <tr key={row._id}>
           <td>{row.productId?.name}</td><td>{row.productId?.sku || '—'}</td><td>{row.productId?.category || row.productId?.categoryId?.name || '—'}</td><td className="right">{row.quantity}</td>
           <td><div className="batch-list">{(row.batches || []).map(batch => <div className="batch-row" key={batch._id}>
-            <div><strong>{batch.batchNo}</strong><small>{new Date(batch.receivedAt).toLocaleDateString()} · {batch.quantity} remaining · Sell {money(batch.sellingPrice)}</small></div>
-            {isOwner && <div className="batch-cost-editor">{batch.costStatus === 'confirmed' ? <span>Buy {money(batch.purchasePrice)}</span> : <><input aria-label={`Buying cost for ${batch.batchNo}`} type="number" min="0" step="0.01" placeholder="Set buying cost" value={costDrafts[batch._id] ?? ''} onChange={e => setCostDrafts(old => ({ ...old, [batch._id]: e.target.value }))}/><button type="button" className="button secondary compact" disabled={costDrafts[batch._id] === undefined || costDrafts[batch._id] === ''} onClick={() => saveCost(batch._id)}>Save cost</button></>}</div>}
-            {!isOwner && batch.costStatus === 'pending_owner' && <span className="muted">Cost pending Owner review</span>}
-          </div>)}{!row.batches?.length && <span className="muted">No batch records</span>}</div></td>
+            <div><strong>{batch.batchNo}</strong><small>{new Date(batch.receivedAt).toLocaleDateString(locale)} · {batch.quantity} {t.remaining} · {t.sellingPriceLabel} {money(batch.sellingPrice)}</small></div>
+            {isOwner && <div className="batch-cost-editor">{batch.costStatus === 'confirmed' ? <span>{t.buy} {money(batch.purchasePrice)}</span> : <><input aria-label={t.buyingCostFor.replace('{batch}', batch.batchNo)} type="number" min="0" step="0.01" placeholder={t.setBuyingCost} value={costDrafts[batch._id] ?? ''} onChange={e => setCostDrafts(old => ({ ...old, [batch._id]: e.target.value }))}/><button type="button" className="button secondary compact" disabled={costDrafts[batch._id] === undefined || costDrafts[batch._id] === ''} onClick={() => saveCost(batch._id)}>{t.saveCost}</button></>}</div>}
+            {!isOwner && batch.costStatus === 'pending_owner' && <span className="muted">{t.costPendingOwner}</span>}
+          </div>)}{!row.batches?.length && <span className="muted">{t.noBatchRecords}</span>}</div></td>
         </tr>)}
-        {!rows.length && <tr><td colSpan="5">No stock recorded for this branch yet.</td></tr>}
+        {!rows.length && <tr><td colSpan="5">{t.noStockRecorded}</td></tr>}
       </tbody></table></div>
     </section>
     <section className="panel table-panel">
-      <div className="panel-title"><div><h2>Batch register</h2><p className="muted">Chronological receipt records for the selected branch.</p></div></div>
-      <div className="table-scroll"><table><thead><tr><th>Batch</th><th>Product</th><th>Received</th><th className="right">Remaining</th><th className="right">Selling price</th>{isOwner && <th className="right">Buying price</th>}<th>Cost status</th></tr></thead><tbody>
-        {batches.map(batch => <tr key={batch._id}><td>{batch.batchNo}</td><td>{batch.productId?.name || '—'}</td><td>{new Date(batch.receivedAt).toLocaleDateString()}</td><td className="right">{batch.quantity}</td><td className="right">{money(batch.sellingPrice)}</td>{isOwner && <td className="right">{batch.purchasePrice == null ? 'Not set' : money(batch.purchasePrice)}</td>}<td>{batch.costStatus === 'confirmed' ? 'Confirmed' : 'Pending Owner'}</td></tr>)}
-        {!batches.length && <tr><td colSpan={isOwner ? 7 : 6}>No batches found.</td></tr>}
+      <div className="panel-title"><div><h2>{t.batchRegister}</h2><p className="muted">{t.batchRegisterHint}</p></div></div>
+      <div className="table-scroll"><table><thead><tr><th>{t.batch}</th><th>{t.product}</th><th>{t.received}</th><th className="right">{t.remaining}</th><th className="right">{t.sellingPriceLabel}</th>{isOwner && <th className="right">{t.buyingPrice}</th>}<th>{t.costStatus}</th></tr></thead><tbody>
+        {batches.map(batch => <tr key={batch._id}><td>{batch.batchNo}</td><td>{batch.productId?.name || '—'}</td><td>{new Date(batch.receivedAt).toLocaleDateString(locale)}</td><td className="right">{batch.quantity.toLocaleString(locale)}</td><td className="right">{money(batch.sellingPrice)}</td>{isOwner && <td className="right">{batch.purchasePrice == null ? t.notSet : money(batch.purchasePrice)}</td>}<td>{batch.costStatus === 'confirmed' ? t.confirmed : t.pendingOwner}</td></tr>)}
+        {!batches.length && <tr><td colSpan={isOwner ? 7 : 6}>{t.noBatches}</td></tr>}
       </tbody></table></div>
     </section>
   </>;
