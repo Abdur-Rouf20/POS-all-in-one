@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="POS MVP - Phase 10 API Tests" tests="7" time="0.861">
+  <testsuite name="01 - Health / Health check" id="b85744f7-e7e5-46d3-9b4b-cacfe18b6cde" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.178">
+    <testcase name="Status is 200" time="0.178" classname="01HealthHealthCheck"/>
+    <testcase name="Health status is ok" time="0.178" classname="01HealthHealthCheck"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Owner login - valid credentials" id="71098e52-4a18-4dbf-b2cc-c6722d33368a" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.358">
+    <testcase name="Status is 200" time="0.358" classname="02AuthenticationOwnerLoginValidCredentials"/>
+    <testcase name="Token and user are returned" time="0.358" classname="02AuthenticationOwnerLoginValidCredentials"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Login - incorrect password" id="8f93c59c-ad74-4cef-84a4-b56479593c03" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.297">
+    <testcase name="Status is 401" time="0.297" classname="02AuthenticationLoginIncorrectPassword"/>
+    <testcase name="Expected authentication error is returned" time="0.297" classname="02AuthenticationLoginIncorrectPassword"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Login - missing credentials" id="2b92eb54-c02e-4a5c-8af4-2869f970f57e" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.008">
+    <testcase name="Status is 401" time="0.008" classname="02AuthenticationLoginMissingCredentials"/>
+    <testcase name="Expected authentication error is returned" time="0.008" classname="02AuthenticationLoginMissingCredentials"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Get current user - valid token" id="99a0cb9d-bd61-44f6-b886-a39bcc0eeb4f" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.009">
+    <testcase name="Status is 200" time="0.009" classname="02AuthenticationGetCurrentUserValidToken"/>
+    <testcase name="Profile contains expected user fields" time="0.009" classname="02AuthenticationGetCurrentUserValidToken"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Get current user - no token" id="c8530f82-4891-4065-ac43-6118f3d3087e" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="Status is 401" time="0.006" classname="02AuthenticationGetCurrentUserNoToken"/>
+    <testcase name="Authentication required message is returned" time="0.006" classname="02AuthenticationGetCurrentUserNoToken"/>
+  </testsuite>
+  <testsuite name="02 - Authentication / Get current user - invalid token" id="276d97bf-7c24-4efe-8e43-589a4fd18265" timestamp="2026-11-14T15:16:55.100Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="Status is 401" time="0.005" classname="02AuthenticationGetCurrentUserInvalidToken"/>
+    <testcase name="Invalid token message is returned" time="0.005" classname="02AuthenticationGetCurrentUserInvalidToken"/>
+  </testsuite>
+</testsuites>

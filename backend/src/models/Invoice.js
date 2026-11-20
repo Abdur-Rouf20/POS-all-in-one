@@ -31,6 +31,8 @@ const invoiceSchema = new mongoose.Schema({
   customerAddress: { type: String, default: '' },
   items: { type: [itemSchema], validate: v => v.length > 0 },
   subtotal: { type: Number, required: true },
+  discountType: { type: String, enum: ['fixed', 'percentage'] },
+  discountValue: { type: Number, min: 0 },
   discount: { type: Number, default: 0, min: 0 },
   taxRate: { type: Number, default: 0, min: 0 },
   taxAmount: { type: Number, default: 0, min: 0 },

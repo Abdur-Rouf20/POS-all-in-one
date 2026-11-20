@@ -11,7 +11,18 @@ const makeBatchNo = () => `B-${new Date().toISOString().slice(0, 10).replaceAll(
 
 export async function listInventory(req, res, next) {
   try {
-    const rows = await Inventory.find({ branchId: req.branchId }).populate('productId').sort({ updatedAt: -1 });
+    const filter = { branchId: req.branchId };
+    const search = String(req.query.q || '').trim();
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escaped, 'i');
+      const matchingProducts = await Product.find({
+        active: true,
+        $or: [{ name: regex }, { sku: regex }, { barcode: regex }, { category: regex }]
+      }).select('_id').lean();
+      filter.productId = { $in: matchingProducts.map(product => product._id) };
+    }
+    const rows = await Inventory.find(filter).populate('productId').sort({ updatedAt: -1 });
     const result = [];
     for (const row of rows) {
       if (!row.productId?.active) continue;

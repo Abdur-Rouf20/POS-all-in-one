@@ -1,0 +1,222 @@
+
+name: POS QA and CI Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/phase-13-github-actions
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  qa-pipeline:
+    name: Build and Automated QA
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      CI: true
+      PORT: 5000
+      MONGO_URI: mongodb://127.0.0.1:27017/pos_mvp
+      CLIENT_ORIGIN: http://localhost:3000
+      API_BASE_URL: http://localhost:5000
+      BASE_URL: http://localhost:3000
+      JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
+      OWNER_NAME: CI Test Owner
+      OWNER_EMAIL: ${{ secrets.POS_OWNER_EMAIL }}
+      OWNER_PASSWORD: ${{ secrets.POS_OWNER_PASSWORD }}
+      POS_OWNER_EMAIL: ${{ secrets.POS_OWNER_EMAIL }}
+      POS_OWNER_PASSWORD: ${{ secrets.POS_OWNER_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            tests/ui/package-lock.json
+            tests/api/package-lock.json
+            tests/reporting/package-lock.json
+
+      - name: Setup Java for JMeter
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install JMeter
+        run: |
+          curl -fsSL https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz -o /tmp/jmeter.tgz
+          tar -xzf /tmp/jmeter.tgz -C /tmp
+          echo "/tmp/apache-jmeter-5.6.3/bin" >> "$GITHUB_PATH"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright dependencies
+        working-directory: tests/ui
+        run: npm ci
+
+      - name: Install Newman dependencies
+        working-directory: tests/api
+        run: npm ci
+
+      - name: Install reporting dependencies
+        working-directory: tests/reporting
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Start POS backend
+        run: |
+          nohup npm --prefix backend start > /tmp/pos-backend.log 2>&1 &
+
+      - name: Wait for backend
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:5000/api/health; then
+              echo "Backend is ready."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend did not start."
+          cat /tmp/pos-backend.log
+          exit 1
+
+      - name: Start POS frontend
+        run: |
+          nohup npm --prefix frontend run dev -- --host 0.0.0.0 --port 3000 > /tmp/pos-frontend.log 2>&1 &
+
+      - name: Wait for frontend
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000/ > /dev/null; then
+              echo "Frontend is ready."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Frontend did not start."
+          cat /tmp/pos-frontend.log
+          exit 1
+
+      - name: Install Playwright Chromium
+        working-directory: tests/ui
+        run: npx playwright install --with-deps chromium
+
+      - name: Run all Playwright UI tests
+        working-directory: tests/ui
+        run: npx playwright test
+
+      - name: Create temporary Newman environment
+        working-directory: tests/api
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const environment = {
+            name: 'GitHub Actions CI',
+            values: [
+              { key: 'api_base_url', value: process.env.API_BASE_URL, enabled: true },
+              { key: 'owner_email', value: process.env.POS_OWNER_EMAIL, enabled: true },
+              { key: 'owner_password', value: process.env.POS_OWNER_PASSWORD, enabled: true },
+              { key: 'access_token', value: '', enabled: true }
+            ]
+          };
+
+          fs.writeFileSync(
+            'POS_Local.private.postman_environment.json',
+            JSON.stringify(environment, null, 2)
+          );
+          NODE
+
+      - name: Run Newman API tests
+        working-directory: tests/api
+        run: npm test
+
+      - name: Run JMeter baseline performance test
+        run: |
+          mkdir -p tests/performance/reports/results
+          jmeter -n \
+            -t tests/performance/test-plans/POS_Baseline_Test.jmx \
+            -l tests/performance/reports/results/ci-baseline.jtl
+
+      - name: Validate JMeter results
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+
+          const file = 'tests/performance/reports/results/ci-baseline.jtl';
+          const lines = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/);
+
+          if (lines.length < 2) {
+            throw new Error('JMeter produced no test samples.');
+          }
+
+          const headers = lines[0].split(',');
+          const successIndex = headers.indexOf('success');
+          const responseIndex = headers.indexOf('responseCode');
+
+          if (successIndex < 0 || responseIndex < 0) {
+            throw new Error('JMeter result columns are missing.');
+          }
+
+          const failures = lines.slice(1).filter(line => {
+            const values = line.split(',');
+            return values[successIndex] !== 'true' ||
+                   values[responseIndex] !== '200';
+          });
+
+          console.log(`JMeter samples: ${lines.length - 1}`);
+          console.log(`JMeter failures: ${failures.length}`);
+
+          if (failures.length > 0) {
+            throw new Error('JMeter baseline test failed.');
+          }
+          NODE
+
+      - name: Generate unified QA report
+        if: always()
+        working-directory: tests/reporting
+        run: npm run report
+
+      - name: Upload QA reports and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pos-qa-reports
+          path: |
+            tests/ui/test-results/
+            tests/ui/playwright-report/
+            tests/api/reports/
+            tests/performance/reports/results/ci-baseline.jtl
+            tests/reporting/reports/
+          if-no-files-found: warn
+          retention-days: 30

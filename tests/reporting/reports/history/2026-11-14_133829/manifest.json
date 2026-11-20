@@ -1,0 +1,41 @@
+{
+  "snapshotId": "2026-11-14_133829",
+  "generatedAt": "2026-11-14T07:38:29.359Z",
+  "files": [
+    {
+      "source": "tests/ui/test-results/junit.xml",
+      "archivedAs": "source-results/playwright-junit.xml",
+      "status": "PASS",
+      "sizeBytes": 1685,
+      "lastModified": "2026-11-04T17:05:47.355Z"
+    },
+    {
+      "source": "tests/api/reports/newman-junit.xml",
+      "archivedAs": "source-results/newman-junit.xml",
+      "status": "PASS",
+      "sizeBytes": 3172,
+      "lastModified": "2026-11-12T14:45:02.049Z"
+    },
+    {
+      "source": "tests/performance/reports/results/load-test.jtl",
+      "archivedAs": "source-results/load-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 18220,
+      "lastModified": "2026-11-12T14:45:02.234Z"
+    },
+    {
+      "source": "tests/performance/reports/results/stress-test.jtl",
+      "archivedAs": "source-results/stress-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 557934,
+      "lastModified": "2026-11-12T14:45:02.251Z"
+    },
+    {
+      "source": "tests/performance/reports/results/spike-test.jtl",
+      "archivedAs": "source-results/spike-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 2983837,
+      "lastModified": "2026-11-12T14:45:02.248Z"
+    }
+  ]
+}
