@@ -11,6 +11,7 @@ import { actorOf, audit } from '../utils/audit.js';
 import { normalizePhone } from '../utils/phone.js';
 import { calculateInvoicePricing, normalizeInitialPayment } from '../utils/invoicePricing.js';
 
+import { enqueueBusinessNotification } from '../services/notifications/enqueueEvent.js';
 function round(n) { return Math.round((Number(n) + Number.EPSILON) * 100) / 100; }
 function makeInvoiceNo() { return `INV-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`; }
 function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
@@ -35,7 +36,12 @@ async function resolveCustomer(body, user) {
     try {
       customer = await Customer.create({
         customerNo: makeCustomerNo(), name, phone, normalizedPhone,
-        address: String(body.customerAddress || '').trim(), createdBy: actorOf(user)
+        address: String(body.customerAddress || '').trim(),
+        notifyChannel: body.notificationPreferences?.notifyChannel || 'auto',
+        notificationConsent: body.notificationPreferences?.notificationConsent || 'unknown',
+        preferredLanguage: body.notificationPreferences?.preferredLanguage || 'en',
+        notificationConsentAt: body.notificationPreferences?.notificationConsent && body.notificationPreferences.notificationConsent !== 'unknown' ? new Date() : null,
+        notificationConsentSource: 'Invoice checkout', createdBy: actorOf(user)
       });
     } catch (error) {
       if (error.code !== 11000) throw error;
@@ -45,6 +51,17 @@ async function resolveCustomer(body, user) {
     let changed = false;
     if (body.customerName && customer.name !== name) { customer.name = name; changed = true; }
     if (body.customerAddress !== undefined && customer.address !== String(body.customerAddress).trim()) { customer.address = String(body.customerAddress).trim(); changed = true; }
+    const preferences = body.notificationPreferences;
+    if (preferences) {
+      if (['auto', 'whatsapp', 'sms'].includes(preferences.notifyChannel)) { customer.notifyChannel = preferences.notifyChannel; changed = true; }
+      if (['unknown', 'opted_in', 'opted_out'].includes(preferences.notificationConsent)) {
+        customer.notificationConsent = preferences.notificationConsent;
+        customer.notificationConsentAt = preferences.notificationConsent === 'unknown' ? null : new Date();
+        customer.notificationConsentSource = 'Invoice checkout';
+        changed = true;
+      }
+      if (['en', 'bn'].includes(preferences.preferredLanguage)) { customer.preferredLanguage = preferences.preferredLanguage; changed = true; }
+    }
     if (changed) await customer.save();
   }
   return customer;
@@ -193,6 +210,7 @@ export async function createInvoice(req, res, next) {
     }
     await Customer.updateOne({ _id: invoice.customerId }, { $set: { lastPurchaseAt: new Date() } });
     await audit(req, 'invoice.create', 'Invoice', invoice._id, { invoiceNo: invoice.invoiceNo, customerId: invoice.customerId, total: invoice.total, paidAmount: invoice.paidAmount, dueAmount: invoice.dueAmount, cashAmount: invoice.cashAmount, banglaQrAmount: invoice.banglaQrAmount });
+    try { await enqueueBusinessNotification({ eventType: 'invoice.created', source: invoice, customerId: invoice.customerId, branchId: invoice.branchId, data: { number: invoice.invoiceNo, total: invoice.total, paid: invoice.paidAmount, due: invoice.dueAmount }, requestedBy: actorOf(req.user) }); } catch (notificationError) { console.error('[notifications] invoice enqueue failed:', notificationError.message); }
     res.status(201).json(safeInvoiceForUser(invoice, req.user));
   } catch (error) { next(error); }
 }

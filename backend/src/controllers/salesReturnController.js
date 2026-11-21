@@ -7,6 +7,7 @@ import StockMovement from '../models/StockMovement.js';
 import MoneyReceipt from '../models/MoneyReceipt.js';
 import { actorOf, audit } from '../utils/audit.js';
 
+import { enqueueBusinessNotification } from '../services/notifications/enqueueEvent.js';
 const round = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 const makeReturnNo = () => `RET-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 
@@ -39,7 +40,7 @@ export async function createSalesReturn(req, res, next) {
   try {
     const { invoiceId, items: requestedItems, settlementType, refundMethod = '', cashRefundAmount = 0, banglaQrRefundAmount = 0, note = '' } = req.body;
     if (!mongoose.isValidObjectId(invoiceId)) throw bad('Select a valid original invoice.');
-    if (!['customer_credit', 'due_adjustment', 'cash_refund'].includes(settlementType)) throw bad('Select a valid return settlement option.');
+    if (!['due_adjustment', 'cash_refund'].includes(settlementType)) throw bad('Select a valid return settlement option.');
     if (!Array.isArray(requestedItems) || !requestedItems.length) throw bad('Select at least one item to return.');
 
     const invoice = await Invoice.findOne({ _id: invoiceId, branchId: req.branchId });
@@ -112,10 +113,10 @@ export async function createSalesReturn(req, res, next) {
       const [branchInvoices, receipts, dueReturns] = await Promise.all([
         Invoice.find({ customerId: invoice.customerId, branchId: req.branchId }).select('dueAmount'),
         MoneyReceipt.find({ customerId: invoice.customerId, branchId: req.branchId }).select('amount'),
-        SalesReturn.find({ customerId: invoice.customerId, branchId: req.branchId, settlementType: 'due_adjustment' }).select('totalRefund')
+        SalesReturn.find({ customerId: invoice.customerId, branchId: req.branchId, settlementType: { $in: ['due_adjustment', 'customer_credit'] } }).select('totalRefund')
       ]);
       const outstanding = round(branchInvoices.reduce((sum, row) => sum + Number(row.dueAmount || 0), 0) - receipts.reduce((sum, row) => sum + Number(row.amount || 0), 0) - dueReturns.reduce((sum, row) => sum + Number(row.totalRefund || 0), 0));
-      if (totalRefund > Math.max(0, outstanding) + 0.000001) throw bad(`Due adjustment cannot exceed the customer's current branch grand due (${Math.max(0, outstanding).toFixed(2)}). Choose customer credit or cash refund if the return value is higher.`);
+      if (totalRefund > Math.max(0, outstanding) + 0.000001) throw bad(`Due adjustment cannot exceed the customer's current branch grand due (${Math.max(0, outstanding).toFixed(2)}). Choose a cash refund if the return value is higher.`);
     }
 
     // Persist the return record first; if a stock update fails, compensating cleanup below removes it.
@@ -164,6 +165,7 @@ export async function createSalesReturn(req, res, next) {
       returnNo: savedReturn.returnNo, invoiceNo: invoice.invoiceNo, customerId: invoice.customerId,
       totalRefund, settlementType, refundMethod: savedReturn.refundMethod, itemCount: items.length
     });
+    try { await enqueueBusinessNotification({ eventType: 'sales_return.created', source: savedReturn, customerId: savedReturn.customerId, branchId: savedReturn.branchId, data: { number: savedReturn.returnNo, invoiceNo: savedReturn.invoiceNo, total: savedReturn.totalRefund, settlementLabel: savedReturn.settlementType === 'due_adjustment' ? 'Due adjusted' : savedReturn.settlementType === 'customer_credit' ? 'Customer credit issued' : 'Cash refund' }, requestedBy: actorOf(req.user) }); } catch (notificationError) { console.error('[notifications] return enqueue failed:', notificationError.message); }
     res.status(201).json(savedReturn);
   } catch (error) {
     if (savedReturn) {

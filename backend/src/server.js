@@ -26,6 +26,7 @@ import reportRoutes from './routes/reportRoutes.js';
 
 import { summary } from './controllers/dashboardController.js';
 import { authenticate, resolveBranch } from './middleware/auth.js';
+import { startNotificationWorker } from './services/notifications/queue.js';
 
 dotenv.config();
 
@@ -180,6 +181,7 @@ connectDB()
   .then(() => {
     app.listen(port, () => {
       console.log(`POS API listening on ${port}`);
+      startNotificationWorker();
     });
   })
   .catch(err => {

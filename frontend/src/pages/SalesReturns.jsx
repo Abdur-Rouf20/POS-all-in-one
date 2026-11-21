@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { RotateCcw, Search, RefreshCw } from 'lucide-react';
 import { api } from '../services/api.js';
 
-const emptyForm = { settlementType: 'customer_credit', refundMethod: 'cash', cashRefundAmount: '', banglaQrRefundAmount: '', note: '' };
+const emptyForm = { settlementType: 'due_adjustment', refundMethod: 'cash', cashRefundAmount: '', banglaQrRefundAmount: '', note: '' };
 
 export default function SalesReturns({ settings, t, lang }) {
   const [invoices, setInvoices] = useState([]);
@@ -137,7 +137,7 @@ export default function SalesReturns({ settings, t, lang }) {
             })}
           </tbody></table></div>
           <div className="form-grid">
-            <div className="field"><label>{t.returnSettlement}</label><select value={form.settlementType} onChange={e => setForm(current => ({ ...current, settlementType: e.target.value, refundMethod: 'cash', cashRefundAmount: '', banglaQrRefundAmount: '' }))}><option value="customer_credit">{t.customerCredit}</option><option value="due_adjustment">{t.adjustGrandDue}</option><option value="cash_refund">{t.cashRefundOption}</option></select></div>
+            <div className="field"><label>{t.returnSettlement}</label><select value={form.settlementType} onChange={e => setForm(current => ({ ...current, settlementType: e.target.value, refundMethod: 'cash', cashRefundAmount: '', banglaQrRefundAmount: '' }))}><option value="due_adjustment">{t.adjustGrandDue}</option><option value="cash_refund">{t.cashRefundOption}</option></select></div>
             <div className="field"><label>{t.returnTotal}</label><input value={money(totalRefund)} readOnly/></div>
           </div>
           {form.settlementType === 'cash_refund' && <>
@@ -145,7 +145,6 @@ export default function SalesReturns({ settings, t, lang }) {
             {form.refundMethod === 'mixed' && <div className="form-grid"><div className="field"><label>{t.cashAmount}</label><input type="number" min="0" step="0.01" value={form.cashRefundAmount} onChange={e => setForm(current => ({ ...current, cashRefundAmount: e.target.value }))}/></div><div className="field"><label>{t.qrAmount}</label><input type="number" min="0" step="0.01" value={form.banglaQrRefundAmount} onChange={e => setForm(current => ({ ...current, banglaQrRefundAmount: e.target.value }))}/></div></div>}
             <div className={`payment-match ${paymentMatches ? 'valid' : 'invalid'}`}>{paymentMatches ? t.returnMatches : t.refundDifference.replace('{amount}', money(totalRefund - cash - qr))}</div>
           </>}
-          {form.settlementType === 'customer_credit' && <div className="alert success">{t.customerCreditHint}</div>}
           {form.settlementType === 'due_adjustment' && <div className="alert success">{t.dueAdjustmentHint}</div>}
           <div className="field"><label>{t.returnNote}</label><textarea rows="2" value={form.note} onChange={e => setForm(current => ({ ...current, note: e.target.value }))} placeholder={t.returnNotePlaceholder}/></div>
           <div className="form-actions"><button className="button primary" disabled={saving || totalRefund <= 0 || !selectedLines.length || !paymentMatches}>{saving ? t.processingReturn : t.confirmSalesReturn}</button></div>
@@ -156,7 +155,7 @@ export default function SalesReturns({ settings, t, lang }) {
     <section className="panel">
       <div className="toolbar"><div><strong>{t.returnHistory}</strong></div><span className="count-pill">{t.returnCount.replace('{count}', String(returns.length))}</span></div>
       <div className="table-wrap"><table><thead><tr><th>{t.returnNumber}</th><th>{t.originalInvoice}</th><th>{t.customer}</th><th>{t.date}</th><th>{t.settlement}</th><th className="right">{t.refundTotal}</th></tr></thead><tbody>
-        {returns.map(row => <tr key={row._id}><td><strong>{row.returnNo}</strong></td><td><Link className="invoice-link" to={`/invoices/${row.invoiceId}`}>{row.invoiceNo}</Link></td><td>{row.customerSnapshot?.name}<small className="cell-sub">{row.customerSnapshot?.phone}</small></td><td>{new Date(row.createdAt).toLocaleString(locale)}</td><td>{row.settlementType === 'customer_credit' ? t.customerCredit : row.settlementType === 'due_adjustment' ? t.dueAdjustmentShort : `${t.cashRefund} · ${row.refundMethod === 'bangla_qr' ? t.banglaQr : row.refundMethod === 'mixed' ? t.mixedPayment : t.cash}`}</td><td className="right amount">{money(row.totalRefund)}</td></tr>)}
+        {returns.map(row => <tr key={row._id}><td><strong>{row.returnNo}</strong></td><td><Link className="invoice-link" to={`/invoices/${row.invoiceId}`}>{row.invoiceNo}</Link></td><td>{row.customerSnapshot?.name}<small className="cell-sub">{row.customerSnapshot?.phone}</small></td><td>{new Date(row.createdAt).toLocaleString(locale)}</td><td>{['customer_credit', 'due_adjustment'].includes(row.settlementType) ? t.dueAdjustmentShort : `${t.cashRefund} · ${row.refundMethod === 'bangla_qr' ? t.banglaQr : row.refundMethod === 'mixed' ? t.mixedPayment : t.cash}`}</td><td className="right amount">{money(row.totalRefund)}</td></tr>)}
         {!loading && returns.length === 0 && <tr><td colSpan="6" className="empty-cell"><RotateCcw size={24}/><p>{t.noReturns}</p></td></tr>}
         {loading && <tr><td colSpan="6" className="empty-cell">{t.loadingReturnHistory}</td></tr>}
       </tbody></table></div>

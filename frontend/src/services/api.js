@@ -74,6 +74,9 @@ export const api = {
   customers: (q = '') => request(`/customers${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   createCustomer: body => request('/customers', { method: 'POST', body: JSON.stringify(body) }),
   customerLedger: id => request(`/customers/${id}/ledger`),
+  updateCustomerNotificationPreferences: (id, body) => request(`/customers/${id}/notification-preferences`, { method: 'PATCH', body: JSON.stringify(body) }),
+  queueCustomerAccountSummary: id => request(`/customers/${id}/account-summary-notifications`, { method: 'POST', body: JSON.stringify({}) }),
+  customerNotifications: id => request(`/customers/${id}/notifications`),
 
   moneyReceipts: (customerId = '') => request(`/money-receipts${customerId ? `?customerId=${encodeURIComponent(customerId)}` : ''}`),
   createMoneyReceipt: body => request('/money-receipts', { method: 'POST', body: JSON.stringify(body) }),
