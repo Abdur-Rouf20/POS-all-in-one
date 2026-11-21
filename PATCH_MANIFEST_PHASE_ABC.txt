@@ -1,0 +1,35 @@
+POS Customer Notifications Phase A-C patch
+Source baseline: user-uploaded POS-all-in-one-main(2).zip (main branch archive)
+Patch contains these relative paths:
+.env.example
+PHASE_ABC_CUSTOMER_NOTIFICATIONS.md
+backend/src/controllers/authController.js
+backend/src/controllers/customerController.js
+backend/src/controllers/invoiceController.js
+backend/src/controllers/moneyReceiptController.js
+backend/src/controllers/salesReturnController.js
+backend/src/controllers/settingsController.js
+backend/src/middleware/auth.js
+backend/src/models/Customer.js
+backend/src/models/NotificationMessage.js
+backend/src/models/Settings.js
+backend/src/routes/customerRoutes.js
+backend/src/server.js
+backend/src/services/notifications/channels/smsProvider.js
+backend/src/services/notifications/channels/whatsappProvider.js
+backend/src/services/notifications/enqueueEvent.js
+backend/src/services/notifications/queue.js
+backend/src/services/notifications/router.js
+backend/src/services/notifications/templates.js
+compose.yaml
+frontend/src/i18n.js
+frontend/src/pages/CustomerLedger.jsx
+frontend/src/pages/InvoiceForm.jsx
+frontend/src/pages/SalesReturns.jsx
+frontend/src/pages/Settings.jsx
+frontend/src/services/api.js
+tests/api/notification-contract.test.mjs
+tests/api/package.json
+tests/performance/NOTIFICATION_QUEUE_TEST.md
+tests/performance/test-plans/notification-queue-smoke.jmx
+tests/ui/tests/customer-notifications.spec.js

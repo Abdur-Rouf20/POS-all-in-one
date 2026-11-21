@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "newman run API_Tests.postman_collection.json -e POS_Local.private.postman_environment.json --reporters cli,htmlextra,junit --reporter-htmlextra-export reports/newman-report.html --reporter-junit-export reports/newman-junit.xml"
+    "test": "newman run API_Tests.postman_collection.json -e POS_Local.private.postman_environment.json --reporters cli,htmlextra,junit --reporter-htmlextra-export reports/newman-report.html --reporter-junit-export reports/newman-junit.xml",
+    "test:notifications": "node --test notification-contract.test.mjs"
   },
   "keywords": [],
   "author": "",

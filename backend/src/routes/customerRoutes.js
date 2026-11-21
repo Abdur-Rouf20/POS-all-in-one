@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { findCustomer, createCustomer, listCustomers, customerLedger } from '../controllers/customerController.js';
+import { findCustomer, createCustomer, listCustomers, customerLedger, updateCustomerNotificationPreferences, queueCustomerAccountSummary, listCustomerNotifications } from '../controllers/customerController.js';
 const router = Router();
 router.use(authenticate, authorize('customer.view'));
 router.get('/lookup', findCustomer);
 router.get('/', listCustomers);
 router.post('/', authorize('customer.create'), createCustomer);
+router.patch('/:id/notification-preferences', authorize('customer.notification.manage'), updateCustomerNotificationPreferences);
+router.post('/:id/account-summary-notifications', authorize('customer.account_summary.send'), queueCustomerAccountSummary);
+router.get('/:id/notifications', authorize('customer.view'), listCustomerNotifications);
 router.get('/:id/ledger', customerLedger);
 export default router;

@@ -6,7 +6,7 @@ import { api } from '../services/api.js';
 const blankItem = () => ({ product: '', name: '', sku: '', quantity: 1, unitPrice: 0, batchId: '' });
 const roundMoney = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 const initialForm = settings => ({
-  customerName: '', customerPhone: '', customerAddress: '', items: [blankItem()],
+  customerName: '', customerPhone: '', customerAddress: '', notifyChannel: 'auto', notificationConsent: 'unknown', preferredLanguage: 'en', items: [blankItem()],
   discountType: 'fixed', discountValue: '0', discount: 0,
   taxRate: String(settings?.taxRate ?? 0), notes: '',
   invoiceDate: new Date().toISOString().slice(0, 10),
@@ -245,7 +245,10 @@ export default function InvoiceForm({ t, settings, lang }) {
           ...current,
           customerName: result.customer.name,
           customerPhone: result.customer.phone,
-          customerAddress: result.customer.address || ''
+          customerAddress: result.customer.address || '',
+          notifyChannel: result.customer.notifyChannel || 'auto',
+          notificationConsent: result.customer.notificationConsent || 'unknown',
+          preferredLanguage: result.customer.preferredLanguage || 'en'
         }));
         setCustomerMessage(t.existingCustomerFound.replace('{number}', result.customer.customerNo));
       } else setCustomerMessage(t.newCustomerMessage);
@@ -362,6 +365,11 @@ export default function InvoiceForm({ t, settings, lang }) {
                 <input id="customer-address" value={form.customerAddress || ''} onChange={e => setForm(current => ({ ...current, customerAddress: e.target.value }))}/>
               </div>
             </div>
+            {!id && <div className="form-grid three notification-checkout-fields">
+              <div className="field"><label htmlFor="checkout-notify-channel">{t.notifyChannel || 'Preferred channel'}</label><select id="checkout-notify-channel" value={form.notifyChannel} onChange={e => setForm(current => ({ ...current, notifyChannel: e.target.value }))}><option value="auto">{t.autoChannel || 'Auto (WhatsApp first)'}</option><option value="whatsapp">{t.whatsappChannel || 'WhatsApp'}</option><option value="sms">{t.smsChannel || 'SMS'}</option></select></div>
+              <div className="field"><label htmlFor="checkout-notify-consent">{t.notificationConsent || 'Customer consent'}</label><select id="checkout-notify-consent" value={form.notificationConsent} onChange={e => setForm(current => ({ ...current, notificationConsent: e.target.value }))}><option value="unknown">{t.consentUnknown || 'Not confirmed'}</option><option value="opted_in">{t.consentOptIn || 'Agreed to notifications'}</option><option value="opted_out">{t.consentOptOut || 'Does not want notifications'}</option></select></div>
+              <div className="field"><label htmlFor="checkout-notify-language">{t.notificationLanguage || 'Message language'}</label><select id="checkout-notify-language" value={form.preferredLanguage} onChange={e => setForm(current => ({ ...current, preferredLanguage: e.target.value }))}><option value="en">English</option><option value="bn">বাংলা</option></select></div>
+            </div>}
             {customerMessage && <p className="field-help" role="status">{customerMessage}</p>}
             {id && <div className="field invoice-revision-reason">
               <label htmlFor="revision-reason">{t.editReason} *</label>
