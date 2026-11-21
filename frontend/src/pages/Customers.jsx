@@ -3,12 +3,13 @@ import { Search, Users, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api.js';
 
-export default function Customers({ settings }) {
+export default function Customers({ settings, t, lang }) {
   const [query, setQuery] = useState('');
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const money = value => `${settings?.currency || '৳'} ${Number(value || 0).toFixed(2)}`;
+  const locale = lang === 'bn' ? 'bn-BD' : 'en-US';
+  const money = value => `${settings?.currency || '৳'} ${Number(value || 0).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   useEffect(() => {
     let active = true;
@@ -24,23 +25,23 @@ export default function Customers({ settings }) {
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">CUSTOMER ACCOUNTS</div>
-          <h1>Customers</h1>
-          <p className="muted">Find customers by name, phone number or Customer ID.</p>
+          <div className="eyebrow">{t.customerAccounts}</div>
+          <h1>{t.navCustomers}</h1>
+          <p className="muted">{t.searchBy}.</p>
         </div>
-        <span className="count-pill">{rows.length} customers</span>
+        <span className="count-pill">{t.customersFound.replace('{count}', String(rows.length))}</span>
       </div>
       {error && <div className="alert error">{error}</div>}
       <section className="panel">
         <div className="toolbar">
           <div className="searchbox">
             <Search size={17} />
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search name, phone or customer ID" />
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.searchBy} />
           </div>
         </div>
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Customer ID</th><th>Name</th><th>Phone</th><th>Address</th><th>Status</th><th /></tr></thead>
+            <thead><tr><th>{t.customerId}</th><th>{t.nameLabel}</th><th>{t.phone}</th><th>{t.addressLabel}</th><th>{t.categoryStatus}</th><th /></tr></thead>
             <tbody>
               {rows.map(customer => (
                 <tr key={customer._id}>
@@ -48,12 +49,12 @@ export default function Customers({ settings }) {
                   <td>{customer.name}</td>
                   <td>{customer.phone}</td>
                   <td>{customer.address || '—'}</td>
-                  <td><span className={`status ${customer.active ? 'paid' : 'unpaid'}`}>{customer.active ? 'Active' : 'Inactive'}</span></td>
-                  <td><Link className="icon-button" to={`/customers/${customer._id}`} title="Customer ledger"><ArrowUpRight size={16} /></Link></td>
+                  <td><span className={`status ${customer.active ? 'paid' : 'unpaid'}`}>{customer.active ? t.active : t.inactive}</span></td>
+                  <td><Link className="icon-button" to={`/customers/${customer._id}`} title={t.customerLedger} aria-label={t.customerLedger}><ArrowUpRight size={16} /></Link></td>
                 </tr>
               ))}
-              {!loading && rows.length === 0 && <tr><td colSpan="6" className="empty-cell"><Users size={24} /><p>No customers found.</p></td></tr>}
-              {loading && <tr><td colSpan="6" className="empty-cell">Loading customers...</td></tr>}
+              {!loading && rows.length === 0 && <tr><td colSpan="6" className="empty-cell"><Users size={24} /><p>{t.noCustomersFound}</p></td></tr>}
+              {loading && <tr><td colSpan="6" className="empty-cell">{t.loadingCustomers}</td></tr>}
             </tbody>
           </table>
         </div>

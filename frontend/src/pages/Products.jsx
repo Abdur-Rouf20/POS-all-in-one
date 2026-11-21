@@ -45,8 +45,8 @@ export default function Products({ t, settings, user }) {
   }
 
   async function toggleActive(product) {
-    const action = product.active === false ? 'reactivate' : 'deactivate';
-    if (!confirm(`Are you sure you want to ${action} ${product.name}?`)) return;
+    const action = product.active === false ? t.reactivate : t.deactivate;
+    if (!confirm(t.confirmProductAction.replace('{action}', action).replace('{name}', product.name))) return;
     try { await api.updateProduct(product._id, { active: product.active === false }); await load(); }
     catch (e) { setError(e.message); }
   }
@@ -55,37 +55,37 @@ export default function Products({ t, settings, user }) {
 
   return <>
     <div className="page-heading">
-      <div><div className="eyebrow">CATALOG</div><h1>{t.productSetup}</h1><p className="muted">Browse products. The Owner manages product definitions and selling prices.</p></div>
+      <div><div className="eyebrow">{t.catalog}</div><h1>{t.productSetup}</h1><p className="muted">{t.browseProducts}</p></div>
       {isOwner && <button className="button primary" onClick={() => open()}><Plus size={17}/>{t.addProduct}</button>}
     </div>
     {error && <div className="alert error">{error}</div>}
     <section className="panel">
-      <div className="toolbar"><div className="searchbox"><Search size={17}/><input value={q} onChange={e => setQ(e.target.value)} placeholder={t.searchProducts}/></div><span className="count-pill">{rows.length} items</span></div>
-      <div className="table-wrap"><table><thead><tr><th>{t.name}</th><th>{t.sku}</th><th>Category</th><th>Unit</th><th className="right">Default selling price</th>{isOwner && <th className="right">Actions</th>}</tr></thead>
+      <div className="toolbar"><div className="searchbox"><Search size={17}/><input value={q} onChange={e => setQ(e.target.value)} placeholder={t.searchProducts}/></div><span className="count-pill">{t.itemCount.replace('{count}', String(rows.length))}</span></div>
+      <div className="table-wrap"><table><thead><tr><th>{t.name}</th><th>{t.sku}</th><th>{t.category}</th><th>{t.unit}</th><th className="right">{t.defaultSellingPrice}</th>{isOwner && <th className="right">{t.actions}</th>}</tr></thead>
         <tbody>{rows.map(product => <tr key={product._id}>
           <td><div className="product-cell"><span className="product-thumb"><Package size={18}/></span><strong>{product.name}</strong></div></td>
           <td className="muted">{product.sku || '—'}</td>
           <td><span className="category-pill">{product.categoryId?.name || product.category || 'General'}</span></td>
           <td>{product.unit || 'pcs'}</td>
           <td className="right amount">{money(product.price)}</td>
-          {isOwner && <td><div className="row-actions"><button className="icon-button" title="Edit product" onClick={() => open(product)}><Pencil size={16}/></button><button className="icon-button" title={product.active === false ? 'Reactivate' : 'Deactivate'} onClick={() => toggleActive(product)}><Power size={16}/></button></div></td>}
+          {isOwner && <td><div className="row-actions"><button className="icon-button" title={t.editProduct} aria-label={t.editProduct} onClick={() => open(product)}><Pencil size={16}/></button><button className="icon-button" title={product.active === false ? t.reactivate : t.deactivate} aria-label={product.active === false ? t.reactivate : t.deactivate} onClick={() => toggleActive(product)}><Power size={16}/></button></div></td>}
         </tr>)}{!rows.length && <tr><td colSpan={isOwner ? 6 : 5} className="empty-cell">{t.noProducts}</td></tr>}</tbody>
       </table></div>
     </section>
-    {editing && <Modal title={editing === 'new' ? t.addProduct : t.editProduct} onClose={() => setEditing(null)}>
+    {editing && <Modal title={editing === 'new' ? t.addProduct : t.editProduct} closeLabel={t.close} onClose={() => setEditing(null)}>
       <form onSubmit={save} className="form-stack">
-        <div className="field"><label>Product name *</label><input required maxLength={150} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}/></div>
+        <div className="field"><label>{t.name} *</label><input required maxLength={150} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}/></div>
         <div className="form-grid">
-          <div className="field"><label>SKU</label><input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} placeholder="Unique product code"/></div>
-          <div className="field"><label>Barcode</label><input value={form.barcode} onChange={e => setForm({ ...form, barcode: e.target.value })}/></div>
-          <div className="field"><label>Category *</label><select required value={form.categoryId} onChange={e => setForm({ ...form, categoryId: e.target.value })}><option value="">Select category</option>{categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}</select></div>
-          <div className="field"><label>Default selling price *</label><input type="number" min="0" step="0.01" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })}/></div>
-          <div className="field"><label>Unit</label><input value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} placeholder="pcs, box, kg"/></div>
+          <div className="field"><label>{t.sku}</label><input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} placeholder={t.productCode}/></div>
+          <div className="field"><label>{t.barcode}</label><input value={form.barcode} onChange={e => setForm({ ...form, barcode: e.target.value })}/></div>
+          <div className="field"><label>{t.category} *</label><select required value={form.categoryId} onChange={e => setForm({ ...form, categoryId: e.target.value })}><option value="">{t.selectCategory}</option>{categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}</select></div>
+          <div className="field"><label>{t.defaultSellingPrice} *</label><input type="number" min="0" step="0.01" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })}/></div>
+          <div className="field"><label>{t.unit}</label><input value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} placeholder={t.unitExamples}/></div>
         </div>
-        <div className="field"><label>Description</label><textarea rows="3" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}/></div>
-        <p className="muted small">Stock quantities and buying prices are managed through stock receiving and batch records, not in product setup.</p>
+        <div className="field"><label>{t.description}</label><textarea rows="3" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}/></div>
+        <p className="muted small">{t.productManagementHint}</p>
         {error && <div className="alert error">{error}</div>}
-        <div className="modal-actions"><button type="button" className="button secondary" onClick={() => setEditing(null)}>{t.cancel}</button><button className="button primary" disabled={busy || !categories.length}>{busy ? 'Saving…' : t.save}</button></div>
+        <div className="modal-actions"><button type="button" className="button secondary" onClick={() => setEditing(null)}>{t.cancel}</button><button className="button primary" disabled={busy || !categories.length}>{busy ? t.saving : t.save}</button></div>
       </form>
     </Modal>}
   </>;

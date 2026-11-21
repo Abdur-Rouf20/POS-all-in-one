@@ -1,3 +1,25 @@
+# POS Unified QA Reporting
+
+This module combines the latest results from:
+
+- Playwright UI tests
+- Newman API tests
+- JMeter load tests
+- JMeter stress tests
+- JMeter spike tests
+
+## Generate a unified report and save history
+
+Run from this directory:
+
+```powershell
+npm run report
+
+
+
+
+
+
 # Unified QA Reporting
 
 Combines existing Playwright UI, Newman API, and JMeter load/stress/spike results.
@@ -42,3 +64,7 @@ Open the HTML report in a browser.
 ## Security
 
 Do not put credentials, tokens, private Postman environments, or local `.env` files in this reporting folder or commit them to Git.
+
+
+
+

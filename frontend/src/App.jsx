@@ -92,7 +92,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login onLogin={setUser} />;
+    return <Login onLogin={setUser} t={t} />;
   }
 
   return (
@@ -100,12 +100,12 @@ export default function App() {
       <div className="branch-strip">
 
         <span>
-          Signed in as <b>{user.name}</b> ({user.role})
+          {t.signedInAs} <b>{user.name}</b> ({user.role === 'owner' ? t.roleOwner : t.roleSalesman})
         </span>
 
         {user.role === 'owner' && (
           <label>
-            Branch
+            {t.branch}
 
             <select
               value={branch}
@@ -121,11 +121,11 @@ export default function App() {
         )}
 
         {user.role === 'salesman' && (
-          <span>Assigned branch</span>
+          <span>{t.assignedBranch}</span>
         )}
 
         <button onClick={logout}>
-          Sign out
+          {t.signOut}
         </button>
 
       </div>
@@ -151,12 +151,12 @@ export default function App() {
 
           <Route
             index
-            element={<Dashboard t={t} settings={settings} />}
+            element={<Dashboard t={t} settings={settings} lang={lang} />}
           />
 
           <Route
             path="reports"
-            element={<Reports settings={settings} user={user} />}
+            element={<Reports settings={settings} user={user} t={t} lang={lang} />}
           />
 
           <Route
@@ -166,34 +166,34 @@ export default function App() {
 
           <Route
             path="inventory"
-            element={<Inventory />}
+            element={<Inventory t={t} settings={settings} lang={lang} />}
           />
 
-          <Route path="customers" element={<Customers settings={settings} />} />
-          <Route path="customers/:id" element={<CustomerLedger settings={settings} />} />
-          <Route path="money-receipts" element={<MoneyReceipts settings={settings} />} />
-          <Route path="money-receipts/:id" element={<MoneyReceiptDetail settings={settings} />} />
-          <Route path="returns" element={<SalesReturns settings={settings} />} />
-          {user.role === 'owner' && <Route path="expenses" element={<Expenses settings={settings} />} />}
+          <Route path="customers" element={<Customers settings={settings} t={t} lang={lang} />} />
+          <Route path="customers/:id" element={<CustomerLedger settings={settings} t={t} lang={lang} />} />
+          <Route path="money-receipts" element={<MoneyReceipts settings={settings} t={t} lang={lang} />} />
+          <Route path="money-receipts/:id" element={<MoneyReceiptDetail settings={settings} t={t} lang={lang} />} />
+          <Route path="returns" element={<SalesReturns settings={settings} t={t} lang={lang} />} />
+          {user.role === 'owner' && <Route path="expenses" element={<Expenses settings={settings} t={t} lang={lang} />} />}
 
           <Route
             path="invoices"
-            element={<Invoices t={t} settings={settings} />}
+            element={<Invoices t={t} settings={settings} lang={lang} />}
           />
 
           <Route
             path="invoices/new"
-            element={<InvoiceForm t={t} settings={settings} />}
+            element={<InvoiceForm t={t} settings={settings} lang={lang} />}
           />
 
           <Route
             path="invoices/:id"
-            element={<InvoiceDetail t={t} settings={settings} />}
+            element={<InvoiceDetail t={t} settings={settings} lang={lang} />}
           />
 
           <Route
             path="invoices/:id/edit"
-            element={<InvoiceForm t={t} settings={settings} />}
+            element={<InvoiceForm t={t} settings={settings} lang={lang} />}
           />
 
           <Route
@@ -205,17 +205,17 @@ export default function App() {
             <>
               <Route
                 path="categories"
-                element={<Categories />}
+                element={<Categories t={t} />}
               />
 
               <Route
                 path="branches"
-                element={<Branches />}
+                element={<Branches t={t} />}
               />
 
               <Route
                 path="users"
-                element={<Users />}
+                element={<Users t={t} />}
               />
             </>
           )}
@@ -224,8 +224,8 @@ export default function App() {
             path="*"
             element={
               <div className="panel">
-                <h2>Page not found</h2>
-                <a href="/">Go to dashboard</a>
+                <h2>{t.pageNotFound}</h2>
+                <a href="/">{t.goToDashboard}</a>
               </div>
             }
           />
