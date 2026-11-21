@@ -4,7 +4,7 @@ import { api } from '../services/api.js';
 
 const initialForm = {
   businessName: 'My POS Store', address: '', phone: '', currency: '৳',
-  taxRate: 0, invoiceFooter: 'Thank you for your business!'
+  taxRate: 0, invoiceFooter: 'Thank you for your business!', notifications: { invoiceCreated: true, salesReturnCreated: true, moneyReceiptCreated: true }
 };
 
 export default function Settings({ t, onSaved }) {
@@ -65,6 +65,21 @@ export default function Settings({ t, onSaved }) {
             <div className="preview-line"/>
             <small>{form.invoiceFooter}</small>
           </div>
+          <button className="button primary" disabled={busy}><Save size={17}/>{busy ? t.loading : t.save}</button>
+        </div>
+      </section>
+      <section className="panel form-panel">
+        <div className="panel-title"><span className="settings-icon"><ReceiptText size={18}/></span><div><h2>{t.notificationSettings || 'Customer notifications'}</h2><p className="muted">{t.notificationSettingsHint || 'Enable or disable automatic customer notifications.'}</p></div></div>
+        <div className="form-stack">
+          {[
+            ['invoiceCreated', t.notifyInvoice || 'Invoice created'],
+            ['salesReturnCreated', t.notifyReturn || 'Sales return'],
+            ['moneyReceiptCreated', t.notifyReceipt || 'Money receipt']
+          ].map(([key, label]) => <label className="field" key={key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input type="checkbox" checked={form.notifications?.[key] !== false} onChange={event => setForm({ ...form, notifications: { ...form.notifications, [key]: event.target.checked } })}/>
+            <span>{label}</span>
+          </label>)}
+          <small className="field-help">{t.notificationsGatewayHint || 'Messages are queued. Delivery requires the notification worker and a configured channel provider.'}</small>
           <button className="button primary" disabled={busy}><Save size={17}/>{busy ? t.loading : t.save}</button>
         </div>
       </section>

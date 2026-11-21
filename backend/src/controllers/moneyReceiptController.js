@@ -4,6 +4,7 @@ import MoneyReceipt from '../models/MoneyReceipt.js';
 import Invoice from '../models/Invoice.js';
 import { actorOf, audit } from '../utils/audit.js';
 
+import { enqueueBusinessNotification } from '../services/notifications/enqueueEvent.js';
 function makeReceiptNo() {
   return `MR-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 }
@@ -28,6 +29,7 @@ export async function createMoneyReceipt(req, res, next) {
       note, receivedBy: actorOf(req.user)
     });
     await audit(req, 'money_receipt.create', 'MoneyReceipt', receipt._id, { receiptNo: receipt.receiptNo, customerId, amount: total, cashAmount: cash, banglaQrAmount: qr });
+    try { await enqueueBusinessNotification({ eventType: 'money_receipt.created', source: receipt, customerId: receipt.customerId, branchId: receipt.branchId, data: { number: receipt.receiptNo, amount: receipt.amount }, requestedBy: actorOf(req.user) }); } catch (notificationError) { console.error('[notifications] receipt enqueue failed:', notificationError.message); }
     res.status(201).json(receipt);
   } catch (error) { next(error); }
 }

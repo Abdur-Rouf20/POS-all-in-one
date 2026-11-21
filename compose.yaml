@@ -20,6 +20,16 @@ services:
       OWNER_EMAIL: ${OWNER_EMAIL:?Set OWNER_EMAIL in .env}
       OWNER_PASSWORD: ${OWNER_PASSWORD:?Set OWNER_PASSWORD in .env}
       DEFAULT_BRANCH_NAME: ${DEFAULT_BRANCH_NAME:-Main Branch}
+      NOTIFICATIONS_WORKER_ENABLED: ${NOTIFICATIONS_WORKER_ENABLED:-false}
+      NOTIFICATION_MIN_DELAY_MS: ${NOTIFICATION_MIN_DELAY_MS:-6000}
+      NOTIFICATION_MAX_DELAY_MS: ${NOTIFICATION_MAX_DELAY_MS:-12000}
+      NOTIFICATION_MAX_ATTEMPTS: ${NOTIFICATION_MAX_ATTEMPTS:-5}
+      WAHA_URL: ${WAHA_URL:-http://waha:3000}
+      WAHA_API_KEY: ${WAHA_API_KEY:-local-dev-change-me}
+      WAHA_SESSION: ${WAHA_SESSION:-default}
+      SMS_ENABLED: ${SMS_ENABLED:-false}
+      SMS_GATEWAY_URL: ${SMS_GATEWAY_URL:-}
+      SMS_GATEWAY_TOKEN: ${SMS_GATEWAY_TOKEN:-}
     ports:
       - "5000:5000"
     depends_on:
@@ -34,6 +44,20 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    restart: unless-stopped
+
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: pos-waha
+    profiles: ["notifications"]
+    environment:
+      WAHA_API_KEY: ${WAHA_API_KEY:-local-dev-change-me}
+      WAHA_DASHBOARD_USERNAME: ${WAHA_DASHBOARD_USERNAME:-admin}
+      WAHA_DASHBOARD_PASSWORD: ${WAHA_DASHBOARD_PASSWORD:-change-this-dashboard-password}
+    ports:
+      - "127.0.0.1:3002:3000"
+    volumes:
+      - waha_sessions:/app/.sessions
     restart: unless-stopped
 
   prometheus:
@@ -72,3 +96,4 @@ volumes:
   mongo_data:
   prometheus_data:
   grafana_data:
+  waha_sessions:
