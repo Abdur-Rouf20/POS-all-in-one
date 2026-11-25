@@ -1,7 +1,7 @@
 {
   "title": "POS Unified QA Report",
-  "generatedAt": "2026-11-14T07:39:31.110Z",
-  "snapshotId": "2026-11-14_133931",
+  "generatedAt": "2026-11-15T09:23:12.581Z",
+  "snapshotId": "2026-11-15_152312",
   "sources": [
     {
       "key": "ui",
@@ -9,18 +9,12 @@
       "type": "junit",
       "file": "tests/ui/test-results/junit.xml",
       "archiveName": "playwright-junit.xml",
-      "available": true,
-      "metrics": {
-        "total": 8,
-        "passed": 8,
-        "failed": 0,
-        "skipped": 0,
-        "status": "PASS"
-      },
-      "status": "PASS",
+      "available": false,
+      "metrics": null,
+      "status": "MISSING",
       "error": null,
-      "sizeBytes": 1685,
-      "lastModified": "2026-11-04T17:05:47.355Z"
+      "sizeBytes": null,
+      "lastModified": null
     },
     {
       "key": "api",
@@ -39,7 +33,7 @@
       "status": "PASS",
       "error": null,
       "sizeBytes": 3172,
-      "lastModified": "2026-11-12T14:45:02.049Z"
+      "lastModified": "2026-11-08T04:57:14.278Z"
     },
     {
       "key": "load",
@@ -66,7 +60,7 @@
       "status": "PASS",
       "error": null,
       "sizeBytes": 18220,
-      "lastModified": "2026-11-12T14:45:02.234Z"
+      "lastModified": "2026-11-15T09:21:25.895Z"
     },
     {
       "key": "stress",
@@ -93,7 +87,7 @@
       "status": "PASS",
       "error": null,
       "sizeBytes": 557934,
-      "lastModified": "2026-11-12T14:45:02.251Z"
+      "lastModified": "2026-11-15T09:21:25.925Z"
     },
     {
       "key": "spike",
@@ -120,7 +114,7 @@
       "status": "PASS",
       "error": null,
       "sizeBytes": 2983837,
-      "lastModified": "2026-11-12T14:45:02.248Z"
+      "lastModified": "2026-11-15T09:21:25.910Z"
     }
   ]
 }

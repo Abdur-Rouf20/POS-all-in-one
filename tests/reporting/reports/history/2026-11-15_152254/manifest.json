@@ -1,0 +1,39 @@
+{
+  "snapshotId": "2026-11-15_152254",
+  "generatedAt": "2026-11-15T09:22:54.801Z",
+  "files": [
+    {
+      "source": "tests/ui/test-results/junit.xml",
+      "archivedAs": null,
+      "status": "MISSING"
+    },
+    {
+      "source": "tests/api/reports/newman-junit.xml",
+      "archivedAs": "source-results/newman-junit.xml",
+      "status": "PASS",
+      "sizeBytes": 3172,
+      "lastModified": "2026-11-08T04:57:14.278Z"
+    },
+    {
+      "source": "tests/performance/reports/results/load-test.jtl",
+      "archivedAs": "source-results/load-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 18220,
+      "lastModified": "2026-11-15T09:21:25.895Z"
+    },
+    {
+      "source": "tests/performance/reports/results/stress-test.jtl",
+      "archivedAs": "source-results/stress-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 557934,
+      "lastModified": "2026-11-15T09:21:25.925Z"
+    },
+    {
+      "source": "tests/performance/reports/results/spike-test.jtl",
+      "archivedAs": "source-results/spike-test.jtl",
+      "status": "PASS",
+      "sizeBytes": 2983837,
+      "lastModified": "2026-11-15T09:21:25.910Z"
+    }
+  ]
+}
