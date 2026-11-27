@@ -18,7 +18,12 @@
 ## Run order
 Run the collection in order. The valid login request stores its token in the collection variable `access_token`; the `/api/auth/me` valid-token request uses it.
 
+## Node unit tests
+The API test package also runs backend unit tests that do not require a running server:
+- `invoicePricing.test.mjs` — invoice totals, discounts, tax, and initial payment validation.
+- `notification-contract.test.mjs` — notification phone normalization and message templates.
 
+Run them with `npm run test:unit` from `tests/api`. The CI `npm test` command runs these unit tests before the Newman API collection.
 
 ## Included tests
 - `GET /api/health`

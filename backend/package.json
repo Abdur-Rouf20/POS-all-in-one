@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test tests/*.test.js",
+    "test": "node --test ../tests/api/invoicePricing.test.mjs",
     "migrate:customers": "node src/scripts/migrateCustomers.js",
     "migrate:categories": "node src/scripts/migrateCategories.js",
     "migrate:batches": "node src/scripts/migrateBatches.js"

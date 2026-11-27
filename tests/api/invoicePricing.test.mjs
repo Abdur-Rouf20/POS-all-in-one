@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateInvoicePricing, normalizeInitialPayment } from '../src/utils/invoicePricing.js';
+import { calculateInvoicePricing, normalizeInitialPayment } from '../../backend/src/utils/invoicePricing.js';
 
 test('fixed discount is deducted before percentage tax', () => {
   assert.deepEqual(
@@ -16,22 +16,35 @@ test('percentage discount is converted to a stored monetary discount', () => {
   );
 });
 
+test('currency calculations round to two decimal places', () => {
+  assert.deepEqual(
+    calculateInvoicePricing({ subtotal: 0.1 + 0.2, discountType: 'fixed', discountValue: 0.01, taxRate: 10 }),
+    { subtotal: 0.3, discountType: 'fixed', discountValue: 0.01, discount: 0.01, taxRate: 10, taxAmount: 0.03, total: 0.32 }
+  );
+});
+
 test('legacy fixed discount defaults remain compatible', () => {
   const result = calculateInvoicePricing({ subtotal: 100, discountType: 'fixed', discountValue: 15, taxRate: 0 });
   assert.equal(result.discount, 15);
   assert.equal(result.total, 85);
 });
 
-test('fixed discount cannot exceed subtotal', () => {
+test('discounts cannot exceed the subtotal or 100 percent', () => {
   assert.throws(() => calculateInvoicePricing({ subtotal: 100, discountType: 'fixed', discountValue: 101 }), /cannot exceed subtotal/i);
+  assert.throws(() => calculateInvoicePricing({ subtotal: 100, discountType: 'percentage', discountValue: 101 }), /cannot exceed 100/i);
 });
 
-test('percentage discount cannot exceed 100 while tax remains a non-negative rate', () => {
-  assert.throws(() => calculateInvoicePricing({ subtotal: 100, discountType: 'percentage', discountValue: 101 }), /cannot exceed 100/i);
+test('tax rates must be non-negative and may exceed 100 percent', () => {
   const pricing = calculateInvoicePricing({ subtotal: 100, taxRate: 125 });
   assert.equal(pricing.taxAmount, 125);
   assert.equal(pricing.total, 225);
   assert.throws(() => calculateInvoicePricing({ subtotal: 100, taxRate: -0.01 }), /non-negative/i);
+});
+
+test('invalid and negative monetary inputs are rejected', () => {
+  assert.throws(() => calculateInvoicePricing({ subtotal: -1 }), /non-negative/i);
+  assert.throws(() => calculateInvoicePricing({ subtotal: 100, discountValue: 'not-a-number' }), /non-negative/i);
+  assert.throws(() => calculateInvoicePricing({ subtotal: 100, discountType: 'invalid' }), /discount type/i);
 });
 
 test('explicit zero initial payment is valid', () => {
