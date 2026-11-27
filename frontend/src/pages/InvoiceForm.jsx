@@ -300,6 +300,13 @@ export default function InvoiceForm({ t, settings, lang }) {
     try {
       const body = {
         ...form,
+        ...(!id ? {
+          notificationPreferences: {
+            notifyChannel: form.notifyChannel,
+            notificationConsent: form.notificationConsent,
+            preferredLanguage: form.preferredLanguage
+          }
+        } : {}),
         items: form.items.map(item => ({
           ...item,
           quantity: Number(item.quantity),
