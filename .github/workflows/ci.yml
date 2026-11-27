@@ -157,7 +157,7 @@ jobs:
           );
           NODE
 
-      - name: Run Newman API tests
+      - name: Run API and unit tests
         working-directory: tests/api
         run: npm test
 
